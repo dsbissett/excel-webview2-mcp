@@ -7,13 +7,13 @@
     "url": "https://github.com/dsbissett/excel-webview2-mcp",
     "source": "github"
   },
-  "version": "0.21.0",
+  "version": "0.0.1",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@dsbissett/excel-webview2-mcp",
-      "version": "0.21.0",
+      "version": "0.0.1",
       "transport": {
         "type": "stdio"
       },
