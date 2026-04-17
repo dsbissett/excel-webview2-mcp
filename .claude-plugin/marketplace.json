@@ -1,10 +1,10 @@
 {
   "name": "excel-webview2-plugins",
-  "version": "0.21.0",
+  "version": "0.0.1",
   "description": "Plugins for automating and debugging Excel add-ins via WebView2.",
   "repository": "https://github.com/dsbissett/excel-webview2-mcp",
   "owner": {
-    "name": "Doug Bissett",
+    "name": "Drake Bissett",
     "email": "dsbissett@gmail.com"
   },
   "plugins": [
