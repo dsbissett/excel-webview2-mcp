@@ -1,0 +1,11 @@
+{
+  "name": "excel-webview2-mcp",
+  "version": "0.21.0",
+  "description": "MCP server for automating and debugging Excel add-ins running in WebView2 via the Chrome DevTools Protocol",
+  "mcpServers": {
+    "excel-webview2": {
+      "command": "npx",
+      "args": ["excel-webview2-mcp@latest"]
+    }
+  }
+}

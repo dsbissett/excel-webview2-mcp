@@ -1,0 +1,17 @@
+{
+  "name": "excel-webview2-plugins",
+  "version": "0.21.0",
+  "description": "Plugins for automating and debugging Excel add-ins via WebView2.",
+  "repository": "https://github.com/dsbissett/excel-webview2-mcp",
+  "owner": {
+    "name": "Doug Bissett",
+    "email": "dsbissett@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "excel-webview2-mcp",
+      "source": "./",
+      "description": "MCP server for automating and debugging Excel add-ins running in WebView2 via the Chrome DevTools Protocol"
+    }
+  ]
+}
