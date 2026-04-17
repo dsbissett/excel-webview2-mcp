@@ -274,7 +274,7 @@ export type ParsedArguments = ReturnType<typeof parseArguments>;
 
 export function parseArguments(version: string, argv = process.argv) {
   const yargsInstance = yargs(hideBin(argv))
-    .scriptName('npx excel-webview2-mcp@latest')
+    .scriptName('npx @dsbissett/excel-webview2-mcp@latest')
     .options(cliOptions)
     .check(args => {
       // Default to connecting to WebView2 on localhost:9222.

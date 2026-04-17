@@ -16,7 +16,7 @@ The workflow below works for most users. See [Troubleshooting: DevTools is not d
    "excel-webview2": {
      "command": "npx",
      "args": [
-       "excel-webview2-mcp@latest",
+       "@dsbissett/excel-webview2-mcp@latest",
        "--wsEndpoint=ws://127.0.0.1:9222/devtools/browser/"
      ],
      "trust": true

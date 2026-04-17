@@ -1,13 +1,13 @@
 # Excel WebView2 CLI
 
-The `excel-webview2-mcp` package includes an **experimental** CLI interface that allows you to interact with the browser directly from your terminal. This is particularly useful for debugging or when you want an agent to generate scripts that automate browser actions.
+The `@dsbissett/excel-webview2-mcp` package includes an **experimental** CLI interface that allows you to interact with the browser directly from your terminal. This is particularly useful for debugging or when you want an agent to generate scripts that automate browser actions.
 
 ## Getting started
 
 Install the package globally to make the `excel-webview2` command available:
 
 ```sh
-npm i excel-webview2-mcp@latest -g
+npm i @dsbissett/excel-webview2-mcp@latest -g
 excel-webview2 status # check if install worked.
 ```
 

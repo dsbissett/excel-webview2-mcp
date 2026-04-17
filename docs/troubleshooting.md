@@ -2,7 +2,7 @@
 
 ## General tips
 
-- Run `npx excel-webview2-mcp@latest --help` to test if the MCP server runs on your machine.
+- Run `npx @dsbissett/excel-webview2-mcp@latest --help` to test if the MCP server runs on your machine.
 - Make sure that your MCP client uses the same npm and node version as your terminal.
 - When configuring your MCP client, try using the `--yes` argument to `npx` to
   auto-accept installation prompt.
@@ -14,7 +14,7 @@
 
 Start the MCP server with debugging enabled and a log file:
 
-- `DEBUG=* npx excel-webview2-mcp@latest --log-file=/path/to/excel-webview2-mcp.log`
+- `DEBUG=* npx @dsbissett/excel-webview2-mcp@latest --log-file=/path/to/excel-webview2-mcp.log`
 
 Using `.mcp.json` to debug while using a client:
 
@@ -25,7 +25,7 @@ Using `.mcp.json` to debug while using a client:
       "type": "stdio",
       "command": "npx",
       "args": [
-        "excel-webview2-mcp@latest",
+        "@dsbissett/excel-webview2-mcp@latest",
         "--log-file",
         "/path/to/excel-webview2-mcp.log"
       ],
@@ -96,7 +96,7 @@ Possible workarounds include:
   2. Start Chrome on the Windows side with:
      `chrome.exe --remote-debugging-port=9222 --user-data-dir=C:\path\to\dir`
   3. Start `excel-webview2-mcp` with:
-     `npx excel-webview2-mcp --browser-url http://127.0.0.1:9222`
+     `npx @dsbissett/excel-webview2-mcp --browser-url http://127.0.0.1:9222`
 
 - **Use PowerShell or Git Bash** instead of WSL.
 
@@ -108,7 +108,7 @@ Possible workarounds include:
   "mcpServers": {
       "excel-webview2": {
         "command": "cmd",
-        "args": ["/c", "npx", "-y", "excel-webview2-mcp@latest"]
+        "args": ["/c", "npx", "-y", "@dsbissett/excel-webview2-mcp@latest"]
       }
     }
   ```
@@ -121,7 +121,7 @@ Possible workarounds include:
   "mcpServers": {
       "excel-webview2": {
         "command": "C:\\nvm4w\\nodejs\\npx.ps1",
-        "args": ["-y", "excel-webview2-mcp@latest"]
+        "args": ["-y", "@dsbissett/excel-webview2-mcp@latest"]
       }
     }
   ```
@@ -161,7 +161,7 @@ If the plugin marketplace approach fails, you can install `excel-webview2-mcp`
 as an MCP server directly without cloning the repository:
 
 ```sh
-claude mcp add excel-webview2 --scope user npx excel-webview2-mcp@latest
+claude mcp add excel-webview2 --scope user npx @dsbissett/excel-webview2-mcp@latest
 ```
 
 This bypasses the git clone entirely and uses npm/npx to fetch the package. Note

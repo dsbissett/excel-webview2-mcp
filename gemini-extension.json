@@ -4,7 +4,7 @@
   "mcpServers": {
     "excel-webview2": {
       "command": "npx",
-      "args": ["excel-webview2-mcp@latest"]
+      "args": ["@dsbissett/excel-webview2-mcp@latest"]
     }
   }
 }

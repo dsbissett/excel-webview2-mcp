@@ -28,7 +28,7 @@ import {commands} from './excel-webview2-cli-options.js';
 import {cliOptions, parseArguments} from './excel-webview2-mcp-cli-options.js';
 
 await checkForUpdates(
-  'Run `npm install -g excel-webview2-mcp@latest` and `excel-webview2 start` to update and restart the daemon.',
+  'Run `npm install -g @dsbissett/excel-webview2-mcp@latest` and `excel-webview2 start` to update and restart the daemon.',
 );
 
 async function start(args: string[]) {

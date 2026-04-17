@@ -13,7 +13,7 @@ const cachePath = process.argv[2];
 if (cachePath) {
   try {
     const response = await fetch(
-      'https://registry.npmjs.org/excel-webview2-mcp/latest',
+      'https://registry.npmjs.org/@dsbissett%2fexcel-webview2-mcp/latest',
     );
     const data = response.ok ? await response.json() : null;
 

@@ -12,7 +12,7 @@
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
-      "identifier": "excel-webview2-mcp",
+      "identifier": "@dsbissett/excel-webview2-mcp",
       "version": "0.21.0",
       "transport": {
         "type": "stdio"

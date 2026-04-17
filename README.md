@@ -4,7 +4,7 @@ Professional MCP connectivity for Microsoft Excel add-ins running inside WebView
 
 | Item | Value |
 | --- | --- |
-| Package | `excel-webview2-mcp` |
+| Package | `@dsbissett/excel-webview2-mcp` |
 | Upstream | Fork of `ChromeDevTools/chrome-devtools-mcp` |
 | Target runtime | Excel add-ins hosted in WebView2 |
 | Debug endpoint | `http://127.0.0.1:9222` |
@@ -50,7 +50,7 @@ Before using this server, make sure all of the following are true:
 2. The add-in is already running under local debugging.
 3. WebView2 remote debugging is enabled and bound to port `9222`.
 4. The debugging endpoint is reachable at `http://127.0.0.1:9222`.
-5. Claude Code can run `npx excel-webview2-mcp@latest`.
+5. Claude Code can run `npx @dsbissett/excel-webview2-mcp@latest`.
 
 The exact way you enable WebView2 remote debugging depends on your Office add-in launch workflow, but the end result must be a live CDP endpoint on port `9222`.
 
@@ -79,7 +79,7 @@ The plugin definition is stored in [`.claude-plugin/plugin.json`](.claude-plugin
   "mcpServers": {
     "excel-webview2": {
       "command": "npx",
-      "args": ["excel-webview2-mcp@latest"]
+      "args": ["@dsbissett/excel-webview2-mcp@latest"]
     }
   }
 }
@@ -94,7 +94,7 @@ If you prefer to configure Claude Code manually instead of installing the plugin
   "mcpServers": {
     "excel-webview2": {
       "command": "npx",
-      "args": ["excel-webview2-mcp@latest"]
+      "args": ["@dsbissett/excel-webview2-mcp@latest"]
     }
   }
 }

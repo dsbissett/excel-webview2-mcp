@@ -80,8 +80,8 @@ _If you are unsure of the user's configuration, ask the user to provide their cu
 
 If the issue is still unclear, run diagnostic commands to test the server directly:
 
-- Run `npx excel-webview2-mcp@latest --help` to verify the installation and Node.js environment.
-- If you need more information, run `DEBUG=* npx excel-webview2-mcp@latest --logFile=/tmp/cdm-test.log` to capture verbose logs. Analyze the output for errors.
+- Run `npx @dsbissett/excel-webview2-mcp@latest --help` to verify the installation and Node.js environment.
+- If you need more information, run `DEBUG=* npx @dsbissett/excel-webview2-mcp@latest --logFile=/tmp/cdm-test.log` to capture verbose logs. Analyze the output for errors.
 
 ### Step 6: Check GitHub for Existing Issues
 

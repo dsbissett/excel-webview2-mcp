@@ -17,7 +17,9 @@ import {VERSION} from '../version.js';
 
 import {cliOptions, parseArguments} from './excel-webview2-mcp-cli-options.js';
 
-await checkForUpdates('Run `npm install excel-webview2-mcp@latest` to update.');
+await checkForUpdates(
+  'Run `npm install @dsbissett/excel-webview2-mcp@latest` to update.',
+);
 
 export const args = parseArguments(VERSION);
 

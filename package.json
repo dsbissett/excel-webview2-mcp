@@ -1,5 +1,5 @@
 {
-  "name": "excel-webview2-mcp",
+  "name": "@dsbissett/excel-webview2-mcp",
   "version": "0.0.1",
   "description": "MCP server for Excel add-ins via WebView2 CDP",
   "type": "module",
