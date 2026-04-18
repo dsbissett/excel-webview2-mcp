@@ -7,6 +7,7 @@
 export enum ToolCategory {
   INPUT = 'input',
   NAVIGATION = 'navigation',
+  EXCEL = 'excel',
   EMULATION = 'emulation',
   PERFORMANCE = 'performance',
   NETWORK = 'network',
@@ -17,6 +18,7 @@ export enum ToolCategory {
 export const labels = {
   [ToolCategory.INPUT]: 'Input automation',
   [ToolCategory.NAVIGATION]: 'Navigation automation',
+  [ToolCategory.EXCEL]: 'Excel',
   [ToolCategory.EMULATION]: 'Emulation',
   [ToolCategory.PERFORMANCE]: 'Performance',
   [ToolCategory.NETWORK]: 'Network',
