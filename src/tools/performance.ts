@@ -38,7 +38,7 @@ export const startTrace = definePageTool({
       .boolean()
       .default(true)
       .describe(
-        'Determines if, once tracing has started, the current selected page should be automatically reloaded. Navigate the page to the right URL using the navigate_page tool BEFORE starting the trace if reload or autoStop is set to true.',
+        'Determines if, once tracing has started, the current selected page should be automatically reloaded.',
       ),
     autoStop: zod
       .boolean()

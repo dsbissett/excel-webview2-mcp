@@ -13,9 +13,7 @@ export async function saveTemporaryFile(
   filename: string,
 ): Promise<{filepath: string}> {
   try {
-    const dir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'excel-webview2-mcp-'),
-    );
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'excel-webview2-mcp-'));
 
     const filepath = path.join(dir, filename);
     await fs.writeFile(filepath, data);

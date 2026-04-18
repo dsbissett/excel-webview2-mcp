@@ -1,6 +1,6 @@
 <!-- AUTO GENERATED DO NOT EDIT - run 'npm run gen' to update-->
 
-# Chrome DevTools MCP Tool Reference (~6951 cl100k_base tokens)
+# Excel WebView2 MCP Tool Reference (~5903 cl100k_base tokens)
 
 - **[Input automation](#input-automation)** (9 tools)
   - [`click`](#click)
@@ -12,16 +12,13 @@
   - [`press_key`](#press_key)
   - [`type_text`](#type_text)
   - [`upload_file`](#upload_file)
-- **[Navigation automation](#navigation-automation)** (6 tools)
+- **[Navigation automation](#navigation-automation)** (4 tools)
   - [`close_page`](#close_page)
   - [`list_pages`](#list_pages)
-  - [`navigate_page`](#navigate_page)
-  - [`new_page`](#new_page)
   - [`select_page`](#select_page)
   - [`wait_for`](#wait_for)
-- **[Emulation](#emulation)** (2 tools)
+- **[Emulation](#emulation)** (1 tools)
   - [`emulate`](#emulate)
-  - [`resize_page`](#resize_page)
 - **[Performance](#performance)** (4 tools)
   - [`performance_analyze_insight`](#performance_analyze_insight)
   - [`performance_start_trace`](#performance_start_trace)
@@ -163,34 +160,6 @@
 
 ---
 
-### `navigate_page`
-
-**Description:** Go to a URL, or back, forward, or reload. Use project URL if not specified otherwise.
-
-**Parameters:**
-
-- **handleBeforeUnload** (enum: "accept", "decline") _(optional)_: Whether to auto accept or beforeunload dialogs triggered by this navigation. Default is accept.
-- **ignoreCache** (boolean) _(optional)_: Whether to ignore cache on reload.
-- **initScript** (string) _(optional)_: A JavaScript script to be executed on each new document before any other scripts for the next navigation.
-- **timeout** (integer) _(optional)_: Maximum wait time in milliseconds. If set to 0, the default timeout will be used.
-- **type** (enum: "url", "back", "forward", "reload") _(optional)_: Navigate the page by URL, back or forward in history, or reload.
-- **url** (string) _(optional)_: Target URL (only type=url)
-
----
-
-### `new_page`
-
-**Description:** Open a new tab and load a URL. Use project URL if not specified otherwise.
-
-**Parameters:**
-
-- **url** (string) **(required)**: URL to load in a new page.
-- **background** (boolean) _(optional)_: Whether to open the page in the background without bringing it to the front. Default is false (foreground).
-- **isolatedContext** (string) _(optional)_: If specified, the page is created in an isolated browser context with the given name. Pages in the same browser context share cookies and storage. Pages in different browser contexts are fully isolated.
-- **timeout** (integer) _(optional)_: Maximum wait time in milliseconds. If set to 0, the default timeout will be used.
-
----
-
 ### `select_page`
 
 **Description:** Select a page as a context for future tool calls.
@@ -217,27 +186,12 @@
 
 ### `emulate`
 
-**Description:** Emulates various features on the selected page.
+**Description:** Throttles network and/or CPU on the selected page.
 
 **Parameters:**
 
-- **colorScheme** (enum: "dark", "light", "auto") _(optional)_: [`Emulate`](#emulate) the dark or the light mode. Set to "auto" to reset to the default.
 - **cpuThrottlingRate** (number) _(optional)_: Represents the CPU slowdown factor. Omit or set the rate to 1 to disable throttling
-- **geolocation** (string) _(optional)_: Geolocation (`&lt;latitude&gt;x&lt;longitude&gt;`) to [`emulate`](#emulate). Latitude between -90 and 90. Longitude between -180 and 180. Omit to clear the geolocation override.
 - **networkConditions** (enum: "Offline", "Slow 3G", "Fast 3G", "Slow 4G", "Fast 4G") _(optional)_: Throttle network. Omit to disable throttling.
-- **userAgent** (string) _(optional)_: User agent to [`emulate`](#emulate). Set to empty string to clear the user agent override.
-- **viewport** (string) _(optional)_: [`Emulate`](#emulate) device viewports '&lt;width&gt;x&lt;height&gt;x&lt;devicePixelRatio&gt;[,mobile][,touch][,landscape]'. 'touch' and 'mobile' to [`emulate`](#emulate) mobile devices. 'landscape' to [`emulate`](#emulate) landscape mode.
-
----
-
-### `resize_page`
-
-**Description:** Resizes the selected page's window so that the page has specified dimension
-
-**Parameters:**
-
-- **height** (number) **(required)**: Page height
-- **width** (number) **(required)**: Page width
 
 ---
 
@@ -262,7 +216,7 @@
 
 - **autoStop** (boolean) _(optional)_: Determines if the trace recording should be automatically stopped.
 - **filePath** (string) _(optional)_: The absolute file path, or a file path relative to the current working directory, to save the raw trace data. For example, trace.json.gz (compressed) or trace.json (uncompressed).
-- **reload** (boolean) _(optional)_: Determines if, once tracing has started, the current selected page should be automatically reloaded. Navigate the page to the right URL using the [`navigate_page`](#navigate_page) tool BEFORE starting the trace if reload or autoStop is set to true.
+- **reload** (boolean) _(optional)_: Determines if, once tracing has started, the current selected page should be automatically reloaded.
 
 ---
 

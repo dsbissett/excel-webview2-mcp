@@ -89,7 +89,7 @@ export const commands: Commands = {
     },
   },
   emulate: {
-    description: 'Emulates various features on the selected page.',
+    description: 'Throttles network and/or CPU on the selected page.',
     category: 'Emulation',
     args: {
       networkConditions: {
@@ -104,35 +104,6 @@ export const commands: Commands = {
         type: 'number',
         description:
           'Represents the CPU slowdown factor. Omit or set the rate to 1 to disable throttling',
-        required: false,
-      },
-      geolocation: {
-        name: 'geolocation',
-        type: 'string',
-        description:
-          'Geolocation (`<latitude>x<longitude>`) to emulate. Latitude between -90 and 90. Longitude between -180 and 180. Omit to clear the geolocation override.',
-        required: false,
-      },
-      userAgent: {
-        name: 'userAgent',
-        type: 'string',
-        description:
-          'User agent to emulate. Set to empty string to clear the user agent override.',
-        required: false,
-      },
-      colorScheme: {
-        name: 'colorScheme',
-        type: 'string',
-        description:
-          'Emulate the dark or the light mode. Set to "auto" to reset to the default.',
-        required: false,
-        enum: ['dark', 'light', 'auto'],
-      },
-      viewport: {
-        name: 'viewport',
-        type: 'string',
-        description:
-          "Emulate device viewports '<width>x<height>x<devicePixelRatio>[,mobile][,touch][,landscape]'. 'touch' and 'mobile' to emulate mobile devices. 'landscape' to emulate landscape mode.",
         required: false,
       },
     },
@@ -373,89 +344,6 @@ export const commands: Commands = {
     category: 'Navigation automation',
     args: {},
   },
-  navigate_page: {
-    description:
-      'Go to a URL, or back, forward, or reload. Use project URL if not specified otherwise.',
-    category: 'Navigation automation',
-    args: {
-      type: {
-        name: 'type',
-        type: 'string',
-        description:
-          'Navigate the page by URL, back or forward in history, or reload.',
-        required: false,
-        enum: ['url', 'back', 'forward', 'reload'],
-      },
-      url: {
-        name: 'url',
-        type: 'string',
-        description: 'Target URL (only type=url)',
-        required: false,
-      },
-      ignoreCache: {
-        name: 'ignoreCache',
-        type: 'boolean',
-        description: 'Whether to ignore cache on reload.',
-        required: false,
-      },
-      handleBeforeUnload: {
-        name: 'handleBeforeUnload',
-        type: 'string',
-        description:
-          'Whether to auto accept or beforeunload dialogs triggered by this navigation. Default is accept.',
-        required: false,
-        enum: ['accept', 'decline'],
-      },
-      initScript: {
-        name: 'initScript',
-        type: 'string',
-        description:
-          'A JavaScript script to be executed on each new document before any other scripts for the next navigation.',
-        required: false,
-      },
-      timeout: {
-        name: 'timeout',
-        type: 'integer',
-        description:
-          'Maximum wait time in milliseconds. If set to 0, the default timeout will be used.',
-        required: false,
-      },
-    },
-  },
-  new_page: {
-    description:
-      'Open a new tab and load a URL. Use project URL if not specified otherwise.',
-    category: 'Navigation automation',
-    args: {
-      url: {
-        name: 'url',
-        type: 'string',
-        description: 'URL to load in a new page.',
-        required: true,
-      },
-      background: {
-        name: 'background',
-        type: 'boolean',
-        description:
-          'Whether to open the page in the background without bringing it to the front. Default is false (foreground).',
-        required: false,
-      },
-      isolatedContext: {
-        name: 'isolatedContext',
-        type: 'string',
-        description:
-          'If specified, the page is created in an isolated browser context with the given name. Pages in the same browser context share cookies and storage. Pages in different browser contexts are fully isolated.',
-        required: false,
-      },
-      timeout: {
-        name: 'timeout',
-        type: 'integer',
-        description:
-          'Maximum wait time in milliseconds. If set to 0, the default timeout will be used.',
-        required: false,
-      },
-    },
-  },
   performance_analyze_insight: {
     description:
       'Provides more detailed information on a specific Performance Insight of an insight set that was highlighted in the results of a trace recording.',
@@ -486,7 +374,7 @@ export const commands: Commands = {
         name: 'reload',
         type: 'boolean',
         description:
-          'Determines if, once tracing has started, the current selected page should be automatically reloaded. Navigate the page to the right URL using the navigate_page tool BEFORE starting the trace if reload or autoStop is set to true.',
+          'Determines if, once tracing has started, the current selected page should be automatically reloaded.',
         required: false,
         default: true,
       },
@@ -539,25 +427,6 @@ export const commands: Commands = {
         description:
           'Whether to include a snapshot in the response. Default is false.',
         required: false,
-      },
-    },
-  },
-  resize_page: {
-    description:
-      "Resizes the selected page's window so that the page has specified dimension",
-    category: 'Emulation',
-    args: {
-      width: {
-        name: 'width',
-        type: 'number',
-        description: 'Page width',
-        required: true,
-      },
-      height: {
-        name: 'height',
-        type: 'number',
-        description: 'Page height',
-        required: true,
       },
     },
   },

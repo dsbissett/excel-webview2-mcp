@@ -2,13 +2,13 @@
 
 Professional MCP connectivity for Microsoft Excel add-ins running inside WebView2.
 
-| Item | Value |
-| --- | --- |
-| Package | `@dsbissett/excel-webview2-mcp` |
-| Upstream | Fork of `ChromeDevTools/chrome-devtools-mcp` |
-| Target runtime | Excel add-ins hosted in WebView2 |
-| Debug endpoint | `http://127.0.0.1:9222` |
-| Recommended setup | Claude Code plugin marketplace |
+| Item              | Value                                        |
+| ----------------- | -------------------------------------------- |
+| Package           | `@dsbissett/excel-webview2-mcp`              |
+| Upstream          | Fork of `ChromeDevTools/chrome-devtools-mcp` |
+| Target runtime    | Excel add-ins hosted in WebView2             |
+| Debug endpoint    | `http://127.0.0.1:9222`                      |
+| Recommended setup | Claude Code plugin marketplace               |
 
 > [!IMPORTANT]
 > This project does **not** launch Excel, start your add-in, or create a browser session.

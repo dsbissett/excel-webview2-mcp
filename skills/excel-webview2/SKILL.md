@@ -35,7 +35,7 @@ If tools fail to connect, verify the debuggable target is available: `curl http:
 2. Interact: Use element `uid`s from snapshot for `click`, `fill`, etc.
 3. Wait: `wait_for` if an action triggers async UI updates
 
-**Note**: Do not use `navigate_page` or `new_page` to navigate to a URL — the add-in controls its own navigation. Use these only if the add-in itself opens new pages or dialogs.
+**Note**: The MCP server exposes no navigation or tab-creation tools — the add-in host owns its URL and window. Attach to an already-running add-in and interact with the pages it exposes.
 
 ### Efficient data retrieval
 
@@ -59,6 +59,6 @@ You can send multiple tool calls in parallel, but maintain correct order: snapsh
 
 **Element not found**: Take a fresh snapshot — the add-in may have re-rendered the page.
 
-**Unexpected navigation**: The add-in controls routing internally; do not call `navigate_page` unless you intend to override the add-in's URL.
+**Unexpected navigation**: The add-in controls routing internally. If the taskpane changes URL on its own, re-run `list_pages` and `select_page` to re-attach to the new target.
 
 For DevTools protocol reference: https://developer.chrome.com/docs/devtools

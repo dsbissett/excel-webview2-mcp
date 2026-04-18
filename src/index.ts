@@ -106,7 +106,7 @@ export async function createMcpServer(
             ignoreDefaultChromeArgs,
             acceptInsecureCerts: serverArgs.acceptInsecureCerts,
             devtools,
-            enableExtensions: serverArgs.categoryExtensions,
+            enableExtensions: false,
             viaCli: serverArgs.viaCli,
           });
 
@@ -141,12 +141,6 @@ export async function createMcpServer(
     if (
       tool.annotations.category === ToolCategory.NETWORK &&
       serverArgs.categoryNetwork === false
-    ) {
-      return;
-    }
-    if (
-      tool.annotations.category === ToolCategory.EXTENSIONS &&
-      !serverArgs.categoryExtensions
     ) {
       return;
     }

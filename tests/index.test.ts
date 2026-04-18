@@ -128,19 +128,6 @@ describe('e2e', () => {
     );
   });
 
-  it('has experimental extensions tools', async () => {
-    await withClient(
-      async client => {
-        const {tools} = await client.listTools();
-        const installExtension = tools.find(
-          t => t.name === 'install_extension',
-        );
-        assert.ok(installExtension);
-      },
-      ['--category-extensions'],
-    );
-  });
-
   it('has experimental vision tools', async () => {
     await withClient(
       async client => {

@@ -24,7 +24,7 @@ import {hideBin, yargs, type CallToolResult} from '../third_party/index.js';
 import {checkForUpdates} from '../utils/check-for-updates.js';
 import {VERSION} from '../version.js';
 
-import {commands} from './excel-webview2-cli-options.js';
+import {commands} from './cliDefinitions.js';
 import {cliOptions, parseArguments} from './excel-webview2-mcp-cli-options.js';
 
 await checkForUpdates(
@@ -56,7 +56,6 @@ delete startCliOptions.experimentalScreencast;
 delete startCliOptions.categoryEmulation;
 delete startCliOptions.categoryPerformance;
 delete startCliOptions.categoryNetwork;
-delete startCliOptions.categoryExtensions;
 // Always on in CLI.
 delete startCliOptions.experimentalStructuredContent;
 // Change the defaults.

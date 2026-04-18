@@ -5,7 +5,7 @@
  */
 
 import {logger} from '../logger.js';
-import type {CdpPage, Dialog} from '../third_party/index.js';
+import type {CdpPage} from '../third_party/index.js';
 import {zod} from '../third_party/index.js';
 
 import {ToolCategory} from './categories.js';
@@ -13,7 +13,6 @@ import {
   CLOSE_PAGE_ERROR,
   definePageTool,
   defineTool,
-  timeoutSchema,
 } from './ToolDefinition.js';
 
 export const listPages = defineTool(args => {
@@ -88,240 +87,6 @@ export const closePage = defineTool({
   },
 });
 
-export const newPage = defineTool({
-  name: 'new_page',
-  description: `Open a new tab and load a URL. Use project URL if not specified otherwise.`,
-  annotations: {
-    category: ToolCategory.NAVIGATION,
-    readOnlyHint: false,
-  },
-  schema: {
-    url: zod.string().describe('URL to load in a new page.'),
-    background: zod
-      .boolean()
-      .optional()
-      .describe(
-        'Whether to open the page in the background without bringing it to the front. Default is false (foreground).',
-      ),
-    isolatedContext: zod
-      .string()
-      .optional()
-      .describe(
-        'If specified, the page is created in an isolated browser context with the given name. ' +
-          'Pages in the same browser context share cookies and storage. ' +
-          'Pages in different browser contexts are fully isolated.',
-      ),
-    ...timeoutSchema,
-  },
-  handler: async (request, response, context) => {
-    const page = await context.newPage(
-      request.params.background,
-      request.params.isolatedContext,
-    );
-
-    await page.waitForEventsAfterAction(
-      async () => {
-        await page.pptrPage.goto(request.params.url, {
-          timeout: request.params.timeout,
-        });
-      },
-      {timeout: request.params.timeout},
-    );
-
-    response.setIncludePages(true);
-    response.setListInPageTools();
-  },
-});
-
-export const navigatePage = definePageTool({
-  name: 'navigate_page',
-  description: `Go to a URL, or back, forward, or reload. Use project URL if not specified otherwise.`,
-  annotations: {
-    category: ToolCategory.NAVIGATION,
-    readOnlyHint: false,
-  },
-  schema: {
-    type: zod
-      .enum(['url', 'back', 'forward', 'reload'])
-      .optional()
-      .describe(
-        'Navigate the page by URL, back or forward in history, or reload.',
-      ),
-    url: zod.string().optional().describe('Target URL (only type=url)'),
-    ignoreCache: zod
-      .boolean()
-      .optional()
-      .describe('Whether to ignore cache on reload.'),
-    handleBeforeUnload: zod
-      .enum(['accept', 'decline'])
-      .optional()
-      .describe(
-        'Whether to auto accept or beforeunload dialogs triggered by this navigation. Default is accept.',
-      ),
-    initScript: zod
-      .string()
-      .optional()
-      .describe(
-        'A JavaScript script to be executed on each new document before any other scripts for the next navigation.',
-      ),
-    ...timeoutSchema,
-  },
-  handler: async (request, response) => {
-    const page = request.page;
-    const options = {
-      timeout: request.params.timeout,
-    };
-
-    if (!request.params.type && !request.params.url) {
-      throw new Error('Either URL or a type is required.');
-    }
-
-    if (!request.params.type) {
-      request.params.type = 'url';
-    }
-
-    const handleBeforeUnload = request.params.handleBeforeUnload ?? 'accept';
-    const dialogHandler = (dialog: Dialog) => {
-      if (dialog.type() === 'beforeunload') {
-        if (handleBeforeUnload === 'accept') {
-          response.appendResponseLine(`Accepted a beforeunload dialog.`);
-          void dialog.accept();
-        } else {
-          response.appendResponseLine(`Declined a beforeunload dialog.`);
-          void dialog.dismiss();
-        }
-        // We are not going to report the dialog like regular dialogs.
-        page.clearDialog();
-      }
-    };
-
-    let initScriptId: string | undefined;
-    if (request.params.initScript) {
-      const {identifier} = await page.pptrPage.evaluateOnNewDocument(
-        request.params.initScript,
-      );
-      initScriptId = identifier;
-    }
-
-    page.pptrPage.on('dialog', dialogHandler);
-
-    try {
-      await page.waitForEventsAfterAction(
-        async () => {
-          switch (request.params.type) {
-            case 'url':
-              if (!request.params.url) {
-                throw new Error(
-                  'A URL is required for navigation of type=url.',
-                );
-              }
-              try {
-                await page.pptrPage.goto(request.params.url, options);
-                response.appendResponseLine(
-                  `Successfully navigated to ${request.params.url}.`,
-                );
-              } catch (error) {
-                response.appendResponseLine(
-                  `Unable to navigate in the selected page: ${error.message}.`,
-                );
-              }
-              break;
-            case 'back':
-              try {
-                await page.pptrPage.goBack(options);
-                response.appendResponseLine(
-                  `Successfully navigated back to ${page.pptrPage.url()}.`,
-                );
-              } catch (error) {
-                response.appendResponseLine(
-                  `Unable to navigate back in the selected page: ${error.message}.`,
-                );
-              }
-              break;
-            case 'forward':
-              try {
-                await page.pptrPage.goForward(options);
-                response.appendResponseLine(
-                  `Successfully navigated forward to ${page.pptrPage.url()}.`,
-                );
-              } catch (error) {
-                response.appendResponseLine(
-                  `Unable to navigate forward in the selected page: ${error.message}.`,
-                );
-              }
-              break;
-            case 'reload':
-              try {
-                await page.pptrPage.reload({
-                  ...options,
-                  ignoreCache: request.params.ignoreCache,
-                });
-                response.appendResponseLine(`Successfully reloaded the page.`);
-              } catch (error) {
-                response.appendResponseLine(
-                  `Unable to reload the selected page: ${error.message}.`,
-                );
-              }
-              break;
-          }
-        },
-        {timeout: request.params.timeout},
-      );
-    } finally {
-      page.pptrPage.off('dialog', dialogHandler);
-      if (initScriptId) {
-        await page.pptrPage
-          .removeScriptToEvaluateOnNewDocument(initScriptId)
-          .catch(error => {
-            logger(`Failed to remove init script`, error);
-          });
-      }
-    }
-
-    response.setIncludePages(true);
-    response.setListInPageTools();
-  },
-});
-
-export const resizePage = definePageTool({
-  name: 'resize_page',
-  description: `Resizes the selected page's window so that the page has specified dimension`,
-  annotations: {
-    category: ToolCategory.EMULATION,
-    readOnlyHint: false,
-  },
-  schema: {
-    width: zod.number().describe('Page width'),
-    height: zod.number().describe('Page height'),
-  },
-  handler: async (request, response, _context) => {
-    const page = request.page;
-
-    try {
-      const browser = page.pptrPage.browser();
-      const windowId = await page.pptrPage.windowId();
-
-      const bounds = await browser.getWindowBounds(windowId);
-
-      if (bounds.windowState === 'fullscreen') {
-        // Have to call this twice on Ubuntu when the window is in fullscreen mode.
-        await browser.setWindowBounds(windowId, {windowState: 'normal'});
-        await browser.setWindowBounds(windowId, {windowState: 'normal'});
-      } else if (bounds.windowState !== 'normal') {
-        await browser.setWindowBounds(windowId, {windowState: 'normal'});
-      }
-    } catch {
-      // Window APIs are not supported on all platforms
-    }
-    await page.pptrPage.resize({
-      contentWidth: request.params.width,
-      contentHeight: request.params.height,
-    });
-
-    response.setIncludePages(true);
-  },
-});
-
 export const handleDialog = definePageTool({
   name: 'handle_dialog',
   description: `If a browser dialog was opened, use this command to handle it`,
@@ -350,7 +115,6 @@ export const handleDialog = definePageTool({
         try {
           await dialog.accept(request.params.promptText);
         } catch (err) {
-          // Likely already handled by the user outside of MCP.
           logger(err);
         }
         response.appendResponseLine('Successfully accepted the dialog');
@@ -360,7 +124,6 @@ export const handleDialog = definePageTool({
         try {
           await dialog.dismiss();
         } catch (err) {
-          // Likely already handled.
           logger(err);
         }
         response.appendResponseLine('Successfully dismissed the dialog');
