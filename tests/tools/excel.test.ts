@@ -7,7 +7,7 @@
 import assert from 'node:assert';
 import {describe, it} from 'node:test';
 
-import {excelContextInfo} from '../../src/tools/excel.js';
+import {excelActiveRange, excelContextInfo} from '../../src/tools/excel.js';
 import {html, withMcpContext} from '../utils.js';
 
 describe('excel', () => {
@@ -120,6 +120,175 @@ describe('excel', () => {
           'SharedRuntime 1.1',
           'DialogApi 1.2',
         ]);
+      });
+    });
+  });
+
+  describe('excel_active_range', () => {
+    it('returns an error when Excel is not on the target', async () => {
+      await withMcpContext(async (response, context) => {
+        const page = context.getSelectedPptrPage();
+        await page.setContent(html`<main>no excel</main>`);
+
+        await excelActiveRange.handler(
+          {
+            params: {},
+            page: context.getSelectedMcpPage(),
+          },
+          response,
+          context,
+        );
+
+        assert.ok(
+          response.responseLines.some(line =>
+            line.includes('Excel API not available'),
+          ),
+          `expected error message, got ${JSON.stringify(response.responseLines)}`,
+        );
+      });
+    });
+
+    it('returns address, dimensions, and values from Excel.run', async () => {
+      await withMcpContext(async (response, context) => {
+        const page = context.getSelectedPptrPage();
+        await page.setContent(html`<main>excel fixture</main>`);
+        await page.evaluate(() => {
+          const globalObject = globalThis as typeof globalThis & {
+            Excel?: unknown;
+          };
+          globalObject.Excel = {
+            run: async (
+              batch: (ctx: {
+                workbook: {getSelectedRange: () => unknown};
+                sync: () => Promise<void>;
+              }) => Promise<unknown>,
+            ) => {
+              const range = {
+                load: () => undefined,
+                address: 'Sheet1!A1:B2',
+                values: [
+                  [1, 2],
+                  [3, 4],
+                ],
+                formulas: [
+                  ['=1', '=2'],
+                  ['=3', '=4'],
+                ],
+                numberFormat: [
+                  ['General', 'General'],
+                  ['General', 'General'],
+                ],
+                rowCount: 2,
+                columnCount: 2,
+              };
+              const ctx = {
+                workbook: {getSelectedRange: () => range},
+                sync: async () => undefined,
+              };
+              return batch(ctx);
+            },
+          };
+        });
+
+        await excelActiveRange.handler(
+          {
+            params: {includeFormulas: true, includeNumberFormat: true},
+            page: context.getSelectedMcpPage(),
+          },
+          response,
+          context,
+        );
+
+        const jsonLine = response.responseLines.find(line =>
+          line.startsWith('{'),
+        );
+        const payload = JSON.parse(jsonLine ?? 'null') as {
+          address: string;
+          rowCount: number;
+          columnCount: number;
+          values: unknown[][];
+          formulas: string[][];
+          numberFormat: string[][];
+          truncated: boolean;
+        };
+
+        assert.strictEqual(payload.address, 'Sheet1!A1:B2');
+        assert.strictEqual(payload.rowCount, 2);
+        assert.strictEqual(payload.columnCount, 2);
+        assert.deepStrictEqual(payload.values, [
+          [1, 2],
+          [3, 4],
+        ]);
+        assert.deepStrictEqual(payload.formulas, [
+          ['=1', '=2'],
+          ['=3', '=4'],
+        ]);
+        assert.strictEqual(payload.truncated, false);
+      });
+    });
+
+    it('truncates values when the range exceeds the cell cap', async () => {
+      await withMcpContext(async (response, context) => {
+        const page = context.getSelectedPptrPage();
+        await page.setContent(html`<main>excel fixture</main>`);
+        await page.evaluate(() => {
+          const globalObject = globalThis as typeof globalThis & {
+            Excel?: unknown;
+          };
+          globalObject.Excel = {
+            run: async (
+              batch: (ctx: {
+                workbook: {getSelectedRange: () => unknown};
+                sync: () => Promise<void>;
+              }) => Promise<unknown>,
+            ) => {
+              const bigValues = Array.from({length: 200}, (_, r) =>
+                Array.from({length: 200}, (_, c) => r * 200 + c),
+              );
+              const range = {
+                load: () => undefined,
+                address: 'Sheet1!A1:GR200',
+                values: bigValues,
+                formulas: bigValues,
+                numberFormat: bigValues,
+                rowCount: 200,
+                columnCount: 200,
+              };
+              const ctx = {
+                workbook: {getSelectedRange: () => range},
+                sync: async () => undefined,
+              };
+              return batch(ctx);
+            },
+          };
+        });
+
+        await excelActiveRange.handler(
+          {
+            params: {},
+            page: context.getSelectedMcpPage(),
+          },
+          response,
+          context,
+        );
+
+        assert.ok(
+          response.responseLines.some(
+            line => line.includes('truncated') && line.includes('200x200'),
+          ),
+          `expected truncation notice, got ${JSON.stringify(response.responseLines)}`,
+        );
+
+        const jsonLine = response.responseLines.find(line =>
+          line.startsWith('{'),
+        );
+        const payload = JSON.parse(jsonLine ?? 'null') as {
+          truncated: boolean;
+          values: unknown[][];
+        };
+        assert.strictEqual(payload.truncated, true);
+        assert.strictEqual(payload.values.length, 1);
+        assert.strictEqual(payload.values[0]?.length, 1);
       });
     });
   });

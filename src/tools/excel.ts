@@ -4,8 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import {zod} from '../third_party/index.js';
+
 import {ToolCategory} from './categories.js';
 import {definePageTool} from './ToolDefinition.js';
+
+const MAX_CELLS = 1000;
 
 const REQUIREMENT_SET_PROBES = [
   ['ExcelApi', '1.1'],
@@ -105,6 +109,117 @@ export const excelContextInfo = definePageTool({
         requirementSets,
       };
     }, REQUIREMENT_SET_PROBES);
+
+    response.appendResponseLine(JSON.stringify(result, null, 2));
+  },
+});
+
+export const excelActiveRange = definePageTool({
+  name: 'excel_active_range',
+  description:
+    'Returns the currently selected Excel range (address, dimensions, and values). Optionally includes formulas and number formats. Requires an Excel add-in target with Excel.run available.',
+  annotations: {
+    category: ToolCategory.EXCEL,
+    readOnlyHint: true,
+  },
+  schema: {
+    includeFormulas: zod
+      .boolean()
+      .optional()
+      .describe('If true, also return the A1-style formulas for each cell.'),
+    includeNumberFormat: zod
+      .boolean()
+      .optional()
+      .describe('If true, also return the Excel number-format code per cell.'),
+  },
+  handler: async (request, response) => {
+    const includeFormulas = request.params.includeFormulas ?? false;
+    const includeNumberFormat = request.params.includeNumberFormat ?? false;
+
+    const result = await request.page.pptrPage.evaluate(
+      async args => {
+        const globalObject = globalThis as typeof globalThis & {
+          Excel?: {
+            run: <T>(
+              batch: (ctx: {
+                workbook: {
+                  getSelectedRange: () => {
+                    load: (props: string | string[]) => void;
+                    address: string;
+                    values: unknown[][];
+                    formulas: string[][];
+                    numberFormat: string[][];
+                    rowCount: number;
+                    columnCount: number;
+                  };
+                };
+                sync: () => Promise<void>;
+              }) => Promise<T>,
+            ) => Promise<T>;
+          };
+        };
+
+        if (typeof globalObject.Excel === 'undefined') {
+          return {error: 'Excel API not available on this target'} as const;
+        }
+
+        try {
+          return await globalObject.Excel.run(async ctx => {
+            const range = ctx.workbook.getSelectedRange();
+            range.load(['address', 'values', 'rowCount', 'columnCount']);
+            if (args.includeFormulas) {
+              range.load('formulas');
+            }
+            if (args.includeNumberFormat) {
+              range.load('numberFormat');
+            }
+            await ctx.sync();
+
+            const totalCells = range.rowCount * range.columnCount;
+            const truncated = totalCells > args.maxCells;
+            const values = truncated
+              ? range.values.slice(0, 1).map(row => row.slice(0, 1))
+              : range.values;
+            const formulas = args.includeFormulas
+              ? truncated
+                ? range.formulas.slice(0, 1).map(row => row.slice(0, 1))
+                : range.formulas
+              : undefined;
+            const numberFormat = args.includeNumberFormat
+              ? truncated
+                ? range.numberFormat.slice(0, 1).map(row => row.slice(0, 1))
+                : range.numberFormat
+              : undefined;
+
+            return {
+              address: range.address,
+              rowCount: range.rowCount,
+              columnCount: range.columnCount,
+              values,
+              formulas,
+              numberFormat,
+              truncated,
+            };
+          });
+        } catch (error) {
+          return {
+            error: `Excel.run failed: ${(error as Error)?.message ?? String(error)}`,
+          } as const;
+        }
+      },
+      {includeFormulas, includeNumberFormat, maxCells: MAX_CELLS},
+    );
+
+    if ('error' in result) {
+      response.appendResponseLine(`ERROR: ${result.error}`);
+      return;
+    }
+
+    if (result.truncated) {
+      response.appendResponseLine(
+        `Range ${result.address} has ${result.rowCount}x${result.columnCount} cells (> ${MAX_CELLS}); values truncated to the first cell.`,
+      );
+    }
 
     response.appendResponseLine(JSON.stringify(result, null, 2));
   },

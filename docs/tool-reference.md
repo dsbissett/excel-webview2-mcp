@@ -1,6 +1,6 @@
 <!-- AUTO GENERATED DO NOT EDIT - run 'npm run gen' to update-->
 
-# Excel WebView2 MCP Tool Reference (~6007 cl100k_base tokens)
+# Excel WebView2 MCP Tool Reference (~6202 cl100k_base tokens)
 
 - **[Input automation](#input-automation)** (9 tools)
   - [`click`](#click)
@@ -17,7 +17,8 @@
   - [`list_pages`](#list_pages)
   - [`select_page`](#select_page)
   - [`wait_for`](#wait_for)
-- **[Excel](#excel)** (1 tools)
+- **[Excel](#excel)** (2 tools)
+  - [`excel_active_range`](#excel_active_range)
   - [`excel_context_info`](#excel_context_info)
 - **[Emulation](#emulation)** (1 tools)
   - [`emulate`](#emulate)
@@ -185,6 +186,17 @@
 ---
 
 ## Excel
+
+### `excel_active_range`
+
+**Description:** Returns the currently selected Excel range (address, dimensions, and values). Optionally includes formulas and number formats. Requires an Excel add-in target with Excel.run available.
+
+**Parameters:**
+
+- **includeFormulas** (boolean) _(optional)_: If true, also return the A1-style formulas for each cell.
+- **includeNumberFormat** (boolean) _(optional)_: If true, also return the Excel number-format code per cell.
+
+---
 
 ### `excel_context_info`
 

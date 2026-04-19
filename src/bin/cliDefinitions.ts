@@ -128,6 +128,27 @@ export const commands: Commands = {
       },
     },
   },
+  excel_active_range: {
+    description:
+      'Returns the currently selected Excel range (address, dimensions, and values). Optionally includes formulas and number formats. Requires an Excel add-in target with Excel.run available.',
+    category: 'Excel',
+    args: {
+      includeFormulas: {
+        name: 'includeFormulas',
+        type: 'boolean',
+        description:
+          'If true, also return the A1-style formulas for each cell.',
+        required: false,
+      },
+      includeNumberFormat: {
+        name: 'includeNumberFormat',
+        type: 'boolean',
+        description:
+          'If true, also return the Excel number-format code per cell.',
+        required: false,
+      },
+    },
+  },
   excel_context_info: {
     description:
       'Returns Office.js and Excel host information for the selected page, including supported requirement sets when available.',
