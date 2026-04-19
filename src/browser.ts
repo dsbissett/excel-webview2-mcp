@@ -10,6 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import {connectWithRetry} from './connection/retry.js';
+import {ConnectionError, getDefaultConnectionHint} from './connection/error.js';
 import {
   beginReconnect,
   getStickyError,
@@ -36,6 +37,16 @@ let browser: Browser | undefined;
 let activeDisconnectListener: (() => void) | undefined;
 
 export const WEBVIEW2_DEBUG_URL = 'http://localhost:9222';
+
+function resolveConnectionErrorUrl(
+  connectOptions: Parameters<typeof puppeteer.connect>[0],
+): string {
+  return (
+    connectOptions.browserURL ??
+    connectOptions.browserWSEndpoint ??
+    WEBVIEW2_DEBUG_URL
+  );
+}
 
 function detachDisconnectListener(): void {
   activeDisconnectListener?.();
@@ -174,12 +185,12 @@ export async function ensureBrowserConnected(options: {
         connectOptions.browserWSEndpoint = browserWSEndpoint;
         setConnectionEndpoint(browserWSEndpoint, endpointSource);
       } catch (error) {
-        throw new Error(
-          `Could not connect to Chrome in ${userDataDir}. Check if Chrome is running and remote debugging is enabled by going to chrome://inspect/#remote-debugging.`,
-          {
-            cause: error,
-          },
-        );
+        throw new ConnectionError({
+          url: resolveConnectionErrorUrl(connectOptions),
+          reason: 'connect-failed',
+          hint: `Could not resolve a running debug session from ${userDataDir}. Check whether DevToolsActivePort exists and the browser was started with remote debugging enabled.`,
+          cause: error,
+        });
       }
     } else {
       if (!channel) {
@@ -218,12 +229,14 @@ export async function ensureBrowserConnected(options: {
       );
       attachDisconnectListener(browser);
     } catch (err) {
-      throw new Error(
-        `Could not connect to Chrome. ${autoConnect ? `Check if Chrome is running and remote debugging is enabled by going to chrome://inspect/#remote-debugging.` : `Check if Chrome is running.`}`,
-        {
-          cause: err,
-        },
-      );
+      throw new ConnectionError({
+        url: resolveConnectionErrorUrl(connectOptions),
+        reason: 'connect-failed',
+        hint: autoConnect
+          ? `Could not connect to the auto-detected debug session. ${getDefaultConnectionHint(resolveConnectionErrorUrl(connectOptions))}`
+          : getDefaultConnectionHint(resolveConnectionErrorUrl(connectOptions)),
+        cause: err,
+      });
     }
   }
   logger('Connected Puppeteer');

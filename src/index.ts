@@ -10,6 +10,7 @@ import type {parseArguments} from './bin/excel-webview2-mcp-cli-options.js';
 import {getConnectionEndpointSource} from './bin/excel-webview2-mcp-cli-options.js';
 import type {Channel} from './browser.js';
 import {ensureBrowserConnected, ensureBrowserLaunched} from './browser.js';
+import {ConnectionError} from './connection/error.js';
 import {setConnectionEndpoint} from './connection/status.js';
 import {loadIssueDescriptions} from './issue-descriptions.js';
 import {logger} from './logger.js';
@@ -268,8 +269,17 @@ export async function createMcpServer(
           return result;
         } catch (err) {
           logger(`${tool.name} error:`, err, err?.stack);
-          let errorText = err && 'message' in err ? err.message : String(err);
-          if ('cause' in err && err.cause) {
+          let errorText =
+            err instanceof ConnectionError
+              ? err.format()
+              : err && 'message' in err
+                ? err.message
+                : String(err);
+          if (
+            !(err instanceof ConnectionError) &&
+            'cause' in err &&
+            err.cause
+          ) {
             errorText += `\nCause: ${err.cause.message}`;
           }
           return {

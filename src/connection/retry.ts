@@ -7,7 +7,7 @@
 import {logger} from '../logger.js';
 import type {Browser} from '../third_party/index.js';
 
-import {ConnectionError} from './error.js';
+import {ConnectionError, getDefaultConnectionHint} from './error.js';
 import {probeCdpEndpoint, type ProbeResult} from './probe.js';
 
 export interface ConnectWithRetryOptions {
@@ -29,7 +29,7 @@ function defaultSleep(ms: number): Promise<void> {
 }
 
 function hintFor(url: string): string {
-  return `Run: curl ${url}/json/version — if this fails, your Excel add-in isn't exposing the debug port.`;
+  return getDefaultConnectionHint(url);
 }
 
 function logAttempt(
