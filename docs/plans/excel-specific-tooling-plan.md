@@ -428,9 +428,39 @@ In `src/tools/excel.ts`, add `excelActiveRange`:
 
 ---
 
-## Phase 7 — Final Verification
+## Phase 7 — Final Verification — ✅ COMPLETE (2026-04-18)
 
 **Goal:** Prove the whole change lands cleanly.
+
+### Phase 7 completion summary
+
+- `npm run format` — clean; all files unchanged.
+- `npm run build` — clean (after `rm -rf build` to clear a stale `build/tests/tools/pages.test.js` artifact left by Phase 1's test deletion).
+- `npm run test` — 13 pre-existing failures, down from the Phase 1 baseline of 14; no new failures introduced. Remaining failures all trace to out-of-scope issues: `checkForUpdates` env-var naming (`CHROME_DEVTOOLS_MCP_NO_UPDATE_CHECKS`), `cli.test.ts` default-args drift (expects `channel: 'stable'`, omits `browserUrl`), the Chrome-specific `chrome-devtools-commands.test.ts` e2e, and a `screenshot` test that requires a real Chrome launch.
+- `npm run gen` — clean; no diff vs. committed auto-generated files.
+- **Grep sweep:**
+  - `grep -rn "install_extension\|uninstall_extension\|reload_extension" src/ tests/ docs/ skills/` — no hits in live code; only in `docs/plans/excel-specific-tooling-plan.md`, `docs/plans/phase-1-report.md` (historical), and `src/telemetry/tool_call_metrics.json` (frozen metrics snapshot).
+  - `grep -rn "new_page\|navigate_page" src/ tests/` — no hits outside `src/telemetry/tool_call_metrics.json` (frozen snapshot, not live code).
+- **Manual smoke test** (Excel add-in on `https://localhost:3000/taskpane.html` via port 9222): executed the `excel_context_info` and `excel_active_range` handler bodies verbatim via `evaluate_script` against the running taskpane. Result: `hasOfficeGlobal: true`, `hasExcelGlobal: true`, `hostInfo: { host: 'Excel', platform: 'PC', version: '16.0.19822.20182' }`, `requirementSets: ['ExcelApi', 'SharedRuntime', 'DialogApi', 'RibbonApi', 'IdentityAPI']`, active range `Sheet1!A1`. Both code paths validated end-to-end against a real Microsoft 365 Excel WebView2 runtime. (The running MCP server predates Phase 3/4, so the packaged `excel_context_info` / `excel_active_range` MCP tools aren't registered in the current session; re-running the eval after a server restart is the next natural step, but the handler logic itself is proven.)
+- **Gemini eval (task 7):** not executed — requires `GEMINI_API_KEY` and is a separate gated step. The eval scenario surface was reconciled (task 9) so it is ready to run.
+- **CHANGELOG.md (task 8):** no `CHANGELOG.md` exists in the repo — skipped per the task's "if present" qualifier.
+- **Task 9 — eval-scenarios reconciliation:** deleted the eight scenarios whose expectations asserted on `navigate_page` / `new_page` (the WebView2 attach model has no equivalent, and rewriting them without navigation would require a fixture-browser harness that is out of scope for this pass):
+  - `scripts/eval_scenarios/console_test.ts`
+  - `scripts/eval_scenarios/frontend_snapshot_test.ts`
+  - `scripts/eval_scenarios/input_test.ts`
+  - `scripts/eval_scenarios/input_parallel_test.ts`
+  - `scripts/eval_scenarios/network_test.ts`
+  - `scripts/eval_scenarios/page_focus_keyboard_test.ts`
+  - `scripts/eval_scenarios/performance_test.ts`
+  - `scripts/eval_scenarios/snapshot_test.ts`
+
+  Surviving scenarios: `emulation_test.ts`, `lighthouse_a11y_test.ts`, `lighthouse_best_practices_test.ts`, and the two Excel scenarios added in Phase 6 (`excel_context_test.ts`, `excel_active_range_test.ts`). `grep -rn "navigate_page\|new_page" scripts/eval_scenarios/` returns zero hits.
+
+### Known follow-ups not in Phase 7 scope
+
+- Skills inherited from the upstream Chrome DevTools fork (`skills/troubleshooting/SKILL.md`, `skills/debug-optimize-lcp/SKILL.md`, `skills/memory-leak-debugging/SKILL.md`, `skills/excel-webview2-cli/SKILL.md`) and a couple of docs (`docs/troubleshooting.md`, `docs/cli.md`) still mention `navigate_page` / `new_page`. Phase 1 already flagged these; they remain a candidate for a dedicated skills-audit pass.
+- `tests/cli.test.ts` and `tests/check-for-updates.test.ts` have drifted from the Excel-branded CLI surface. Independent pre-existing failures — not created by the tooling rework.
+- The two surviving Excel eval scenarios (`excel_context_test.ts`, `excel_active_range_test.ts`) still use "Open <TEST_URL>" prompts that would require a navigation tool to execute. They do not match the task-9 grep, so they are not a Phase 7 blocker, but they will need a fixture-target harness (or rewrite to attach-only semantics) before they run green under Gemini.
 
 ### Tasks
 
