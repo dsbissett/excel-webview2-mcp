@@ -63,6 +63,76 @@ curl http://127.0.0.1:9222/json
 > [!WARNING]
 > If the add-in is not already running locally with remote debugging enabled on port `9222`, this server has nothing to attach to.
 
+## Launching Excel with the debug port
+
+This section applies to **Excel desktop on Windows**. Per Microsoft's WebView2 and Office add-in documentation, the supported way to pass Chromium flags into the WebView2 runtime is `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS`. The WebView2 team also documents a registry-based fallback for persistent configuration.
+
+If you are using **Excel for Mac**, this MCP server does not apply. Microsoft documents Excel for Mac debugging through Safari Web Inspector instead of a WebView2 CDP port.
+
+Sources:
+
+- WebView2 debug arguments and registry policy: <https://learn.microsoft.com/en-us/microsoft-edge/webview2/how-to/debug-visual-studio-code>
+- Office add-ins debugging with Edge DevTools: <https://learn.microsoft.com/en-us/office/dev/add-ins/testing/debug-add-ins-using-devtools-edge-chromium>
+- Office add-ins debugging overview, including Mac: <https://learn.microsoft.com/en-us/office/dev/add-ins/testing/debug-add-ins-overview>
+
+### Windows: preferred local-dev setup
+
+Set the environment variable before launching Excel so the Excel process inherits it:
+
+```powershell
+$env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS="--remote-debugging-port=9222"
+```
+
+Then:
+
+1. Launch Excel from that same shell or from a parent process that inherited the variable.
+2. Start your add-in locally.
+3. Confirm the debug endpoint is live.
+
+Worked example:
+
+```powershell
+$env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS="--remote-debugging-port=9222"
+start excel.exe
+```
+
+The Office add-ins team documents this environment-variable mechanism generically for WebView2-hosted add-ins, and the WebView2 team documents `--remote-debugging-port=9222` as a valid browser argument.
+
+### Windows: persistent registry fallback
+
+If you need a persistent machine-local setting, the WebView2 team documents this registry policy path:
+
+```text
+HKEY_CURRENT_USER\Software\Policies\Microsoft\Edge\WebView2\AdditionalBrowserArguments
+```
+
+Use:
+
+- Value name: `EXCEL.EXE`
+- Value data: `--remote-debugging-port=9222`
+
+Use the environment variable first for local development. It is easier to turn on and off and avoids leaving a persistent machine-wide setting behind.
+
+### Verify the endpoint
+
+Run:
+
+```sh
+curl http://127.0.0.1:9222/json/version
+```
+
+A healthy response is JSON and includes fields such as:
+
+```json
+{
+  "Browser": "...",
+  "Protocol-Version": "...",
+  "webSocketDebuggerUrl": "ws://127.0.0.1:9222/devtools/browser/..."
+}
+```
+
+If that `curl` command fails, Excel is not exposing the WebView2 debug port yet, and `excel-webview2-mcp` will not be able to attach.
+
 ## Claude Code Setup
 
 The recommended path is to install this project through the bundled Claude Code plugin marketplace metadata included in this repository.

@@ -7,12 +7,11 @@ description: Uses Excel WebView2 via MCP to debug, inspect, and automate an Exce
 
 This skill connects to an **already-running** Excel add-in WebView2 instance. The MCP server does **not** launch Chrome or create a browser — it attaches to the existing WebView2 remote debugging endpoint at `http://localhost:9222`.
 
-Before using any tools, the user must:
+Before using any tools, the user must have their add-in running locally with the WebView2 debug port enabled. Setup instructions live in one place:
 
-1. Have their Excel add-in loaded and running in Excel
-2. Have remote debugging enabled on port 9222 (configured in the add-in host or launch settings)
+[README.md#launching-excel-with-the-debug-port](../../README.md#launching-excel-with-the-debug-port)
 
-If tools fail to connect, verify the debuggable target is available: `curl http://localhost:9222/json`
+If tools fail to connect, verify the debuggable target is available: `curl http://localhost:9222/json/version`
 
 ## Core Concepts
 

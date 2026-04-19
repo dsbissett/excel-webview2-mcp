@@ -39,6 +39,24 @@ Using `.mcp.json` to debug while using a client:
 
 ## Specific problems
 
+### Connection refused
+
+If a tool reports that the Excel WebView2 debug endpoint is unreachable, first verify that Excel was launched with the WebView2 debug port enabled and that the endpoint is actually live.
+
+See [Launching Excel with the debug port](../README.md#launching-excel-with-the-debug-port).
+
+Then run:
+
+```sh
+curl http://127.0.0.1:9222/json/version
+```
+
+If that request fails, `excel-webview2-mcp` has nothing to attach to. On Windows, the recommended setup is to launch Excel from a shell where:
+
+```powershell
+$env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS="--remote-debugging-port=9222"
+```
+
 ### `Error [ERR_MODULE_NOT_FOUND]: Cannot find module ...`
 
 This usually indicates either a non-supported Node version is in use or that the
