@@ -78,6 +78,8 @@ export const excelLaunchAddin = defineTool((args?: ParsedArguments) => ({
     extraBrowserArgs: zod.array(zod.string()).optional(),
     timeoutMs: zod.number().int().positive().optional(),
     autoConnect: zod.boolean().optional(),
+    skipDevServer: zod.boolean().optional(),
+    devServerTimeoutMs: zod.number().int().positive().optional(),
   },
   handler: async (request, response) => {
     const deps = getLifecycleDeps();
@@ -109,6 +111,11 @@ export const excelLaunchAddin = defineTool((args?: ParsedArguments) => ({
       return;
     }
 
+    if (project.devServer && !request.params.skipDevServer) {
+      response.appendResponseLine(
+        `Dev server script: '${project.devServer.script}' on port ${project.devServer.port}.`,
+      );
+    }
     response.appendResponseLine(
       `Launching office-addin-debugging on port ${port} (timeout ${timeoutMs}ms)...`,
     );
@@ -119,6 +126,8 @@ export const excelLaunchAddin = defineTool((args?: ParsedArguments) => ({
         port,
         extraBrowserArgs: request.params.extraBrowserArgs,
         timeoutMs,
+        skipDevServer: request.params.skipDevServer,
+        devServerTimeoutMs: request.params.devServerTimeoutMs,
       });
       trackedByManifest.set(project.manifestPath, {project, result});
       response.appendResponseLine(

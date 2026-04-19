@@ -1,5 +1,6 @@
 import {spawn, type ChildProcessWithoutNullStreams} from 'node:child_process';
 import fs from 'node:fs/promises';
+import net from 'node:net';
 import path from 'node:path';
 
 import {probeCdpEndpoint, type ProbeResult} from '../connection/probe.js';
@@ -12,6 +13,8 @@ export interface LaunchOptions {
   extraBrowserArgs?: string[];
   timeoutMs?: number;
   signal?: AbortSignal;
+  skipDevServer?: boolean;
+  devServerTimeoutMs?: number;
 }
 
 export interface LaunchResult {
@@ -26,6 +29,8 @@ export type LaunchErrorReason =
   | 'port-already-configured'
   | 'launch-failed'
   | 'cdp-not-ready'
+  | 'dev-server-not-ready'
+  | 'dev-server-failed'
   | 'stop-failed'
   | 'aborted';
 
@@ -70,6 +75,14 @@ interface TrackedLaunch {
   pid: number;
   project: AddinProject;
   stopPromise?: Promise<void>;
+  devServer?: DevServerHandle;
+}
+
+interface DevServerHandle {
+  child: LaunchChildProcess;
+  output: string[];
+  port: number;
+  preexisting: boolean;
 }
 
 interface CleanupProcess {
@@ -105,8 +118,10 @@ interface LaunchExcelTestingApi {
 
 const DEFAULT_CDP_PORT = 9222;
 const DEFAULT_TIMEOUT_MS = 60_000;
+const DEFAULT_DEV_SERVER_TIMEOUT_MS = 90_000;
 const PROBE_INTERVAL_MS = 500;
 const PROBE_TIMEOUT_MS = 1000;
+const DEV_SERVER_PROBE_TIMEOUT_MS = 1500;
 const STOP_TIMEOUT_MS = 10_000;
 const MAX_OUTPUT_LINES = 200;
 const LAUNCHER_NAME = 'office-addin-debugging';
@@ -159,6 +174,8 @@ function createLaunchExcelImpl(
 
     const port = options.port ?? DEFAULT_CDP_PORT;
     const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+    const devServerTimeoutMs =
+      options.devServerTimeoutMs ?? DEFAULT_DEV_SERVER_TIMEOUT_MS;
     const cdpUrl = `http://localhost:${port}`;
     const launcher = await resolveLauncher(options.project.root, deps);
     const env = buildLaunchEnv({
@@ -167,6 +184,16 @@ function createLaunchExcelImpl(
       extraBrowserArgs: options.extraBrowserArgs,
       projectRoot: options.project.root,
     });
+
+    const devServer = options.skipDevServer
+      ? undefined
+      : await ensureDevServerRunning({
+          deps,
+          project: options.project,
+          env,
+          timeoutMs: devServerTimeoutMs,
+          signal: options.signal,
+        });
 
     let launchChild: LaunchChildProcess;
     try {
@@ -182,6 +209,9 @@ function createLaunchExcelImpl(
         },
       );
     } catch (error) {
+      if (devServer && !devServer.preexisting) {
+        killChild(devServer.child);
+      }
       throw new LaunchError(
         'launch-failed',
         `Failed to spawn ${LAUNCHER_NAME} (${launcher.command}): ${(error as Error).message}`,
@@ -213,6 +243,9 @@ function createLaunchExcelImpl(
       });
     } catch (error) {
       killChild(launchChild);
+      if (devServer && !devServer.preexisting) {
+        killChild(devServer.child);
+      }
       throw error;
     }
 
@@ -225,6 +258,7 @@ function createLaunchExcelImpl(
       output,
       pid,
       project: options.project,
+      devServer,
     };
     state.tracked.set(pid, trackedLaunch);
     void childOutcome.finally(() => {
@@ -262,6 +296,9 @@ function resetRuntimeState(
 
   for (const trackedLaunch of state.tracked.values()) {
     killChild(trackedLaunch.child);
+    if (trackedLaunch.devServer && !trackedLaunch.devServer.preexisting) {
+      killChild(trackedLaunch.devServer.child);
+    }
   }
 
   state.tracked.clear();
@@ -522,6 +559,162 @@ async function waitForCdpReady(options: {
   );
 }
 
+async function ensureDevServerRunning(args: {
+  deps: LaunchExcelDeps;
+  project: AddinProject;
+  env: NodeJS.ProcessEnv;
+  timeoutMs: number;
+  signal?: AbortSignal;
+}): Promise<DevServerHandle | undefined> {
+  const devServer = args.project.devServer;
+  if (!devServer) {
+    return undefined;
+  }
+
+  const url = `http://localhost:${devServer.port}`;
+
+  if (await isPortListening(devServer.port, DEV_SERVER_PROBE_TIMEOUT_MS)) {
+    return {
+      child: undefined as unknown as LaunchChildProcess,
+      output: [],
+      port: devServer.port,
+      preexisting: true,
+    };
+  }
+
+  const runner = resolvePackageRunner(args.project.packageManager);
+  const output: string[] = [];
+  let child: LaunchChildProcess;
+  try {
+    child = spawnPackageScript(args.deps, runner, devServer.script, {
+      cwd: args.project.root,
+      env: args.env,
+      stdio: 'pipe',
+      windowsHide: false,
+    });
+  } catch (error) {
+    if (await isPortListening(devServer.port, DEV_SERVER_PROBE_TIMEOUT_MS)) {
+      return {
+        child: undefined as unknown as LaunchChildProcess,
+        output: [],
+        port: devServer.port,
+        preexisting: true,
+      };
+    }
+    throw new LaunchError(
+      'dev-server-failed',
+      `Failed to spawn dev server (${runner} run ${devServer.script}): ${(error as Error).message}. If the dev server is already running elsewhere, re-invoke excel_launch_addin with skipDevServer: true.`,
+      {cause: error},
+    );
+  }
+
+  attachOutputBuffer(child, output);
+  const childOutcome = monitorChild(child);
+
+  const deadline = args.deps.now() + args.timeoutMs;
+  let outcome: ChildOutcome | undefined;
+  void childOutcome.then(result => {
+    outcome = result;
+  });
+
+  while (args.deps.now() <= deadline) {
+    if (args.signal?.aborted) {
+      killChild(child);
+      throw new LaunchError('aborted', 'Excel add-in launch was aborted.', {
+        output,
+      });
+    }
+    if (outcome) {
+      throw new LaunchError(
+        'dev-server-failed',
+        `Dev server script '${devServer.script}' exited before ${url} became ready.`,
+        {output},
+      );
+    }
+    if (await isPortListening(devServer.port, DEV_SERVER_PROBE_TIMEOUT_MS)) {
+      return {child, output, port: devServer.port, preexisting: false};
+    }
+    await args.deps.sleep(
+      Math.min(PROBE_INTERVAL_MS, Math.max(1, deadline - args.deps.now())),
+    );
+  }
+
+  killChild(child);
+  throw new LaunchError(
+    'dev-server-not-ready',
+    `Timed out waiting for dev server at ${url} (script '${devServer.script}').`,
+    {output},
+  );
+}
+
+async function isPortListening(
+  port: number,
+  timeoutMs: number,
+): Promise<boolean> {
+  return new Promise(resolve => {
+    const socket = net.createConnection({host: '127.0.0.1', port});
+    let settled = false;
+    const finish = (listening: boolean) => {
+      if (settled) return;
+      settled = true;
+      socket.destroy();
+      resolve(listening);
+    };
+    socket.setTimeout(timeoutMs);
+    socket.once('connect', () => finish(true));
+    socket.once('timeout', () => finish(false));
+    socket.once('error', () => finish(false));
+  });
+}
+
+function resolvePackageRunner(
+  packageManager: AddinProject['packageManager'],
+): string {
+  return packageManager;
+}
+
+function spawnPackageScript(
+  deps: LaunchExcelDeps,
+  runner: string,
+  script: string,
+  options: {
+    cwd: string;
+    env: NodeJS.ProcessEnv;
+    stdio: 'pipe';
+    windowsHide: boolean;
+  },
+): LaunchChildProcess {
+  const isWindows = deps.processRef.platform === 'win32';
+  const command = isWindows ? `${runner}.cmd` : runner;
+  const args = ['run', script];
+
+  if (isWindows) {
+    return deps.spawn(`"${command}"`, args.map(quoteWindowsShellArg), {
+      ...options,
+      shell: true,
+    }) as LaunchChildProcess;
+  }
+
+  return deps.spawn(command, args, options) as LaunchChildProcess;
+}
+
+function attachOutputBuffer(child: LaunchChildProcess, output: string[]): void {
+  const append = (chunk: string) => {
+    const lines = chunk
+      .split(/\r?\n/)
+      .map(line => line.trimEnd())
+      .filter(Boolean);
+    for (const line of lines) {
+      output.push(line);
+    }
+    if (output.length > MAX_OUTPUT_LINES) {
+      output.splice(0, output.length - MAX_OUTPUT_LINES);
+    }
+  };
+  child.stdout?.on('data', chunk => append(String(chunk)));
+  child.stderr?.on('data', chunk => append(String(chunk)));
+}
+
 function throwIfAborted(
   signal: AbortSignal | undefined,
   output: string[],
@@ -574,6 +767,9 @@ async function stopTrackedLaunch(
       } finally {
         state.tracked.delete(trackedLaunch.pid);
         killChild(trackedLaunch.child);
+        if (trackedLaunch.devServer && !trackedLaunch.devServer.preexisting) {
+          killChild(trackedLaunch.devServer.child);
+        }
       }
     })();
   }
@@ -684,6 +880,13 @@ function killChild(child: LaunchChildProcess): void {
   }
 
   try {
+    if (process.platform === 'win32' && child.pid) {
+      spawn('taskkill', ['/pid', String(child.pid), '/T', '/F'], {
+        stdio: 'ignore',
+        windowsHide: true,
+      });
+      return;
+    }
     child.kill();
   } catch {
     // Best-effort cleanup only.
@@ -701,6 +904,9 @@ function ensureCleanupHandlersRegistered(
   state.exitHandler = () => {
     for (const trackedLaunch of state.tracked.values()) {
       killChild(trackedLaunch.child);
+      if (trackedLaunch.devServer && !trackedLaunch.devServer.preexisting) {
+        killChild(trackedLaunch.devServer.child);
+      }
     }
   };
   state.sigintHandler = () => {

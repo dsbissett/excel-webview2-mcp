@@ -7,10 +7,17 @@ export interface AddinProject {
   manifestKind: 'xml' | 'json';
   packageManager: 'npm' | 'pnpm' | 'yarn';
   existingCdpScript?: string;
+  devServer?: {
+    script: string;
+    port: number;
+  };
 }
 
 interface PackageJson {
   scripts?: Record<string, string>;
+  config?: {
+    dev_server_port?: unknown;
+  };
 }
 
 export async function detectExcelAddin(
@@ -37,7 +44,27 @@ export async function detectExcelAddin(
     manifestKind: manifest.manifestKind,
     packageManager: await detectPackageManager(root),
     existingCdpScript: detectExistingCdpScript(packageJson.scripts),
+    devServer: detectDevServer(packageJson),
   };
+}
+
+function detectDevServer(packageJson: PackageJson): AddinProject['devServer'] {
+  const scripts = packageJson.scripts;
+  if (!scripts) {
+    return undefined;
+  }
+  const scriptName = ['dev-server', 'dev:server', 'dev'].find(name => {
+    return typeof scripts[name] === 'string' && scripts[name].length > 0;
+  });
+  if (!scriptName) {
+    return undefined;
+  }
+  const rawPort = packageJson.config?.dev_server_port;
+  const port = typeof rawPort === 'number' ? rawPort : Number(rawPort);
+  if (!Number.isFinite(port) || port <= 0) {
+    return undefined;
+  }
+  return {script: scriptName, port};
 }
 
 async function findPackageRoot(cwd: string): Promise<string | null> {
