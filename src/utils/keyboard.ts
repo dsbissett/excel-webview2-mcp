@@ -1,9 +1,3 @@
-/**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import type {KeyInput} from '../third_party/index.js';
 
 // See the KeyInput type for the list of supported keys.

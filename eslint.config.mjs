@@ -1,9 +1,3 @@
-/**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import js from '@eslint/js';
 import stylisticPlugin from '@stylistic/eslint-plugin';
 import {defineConfig, globalIgnores} from 'eslint/config';
@@ -65,7 +59,6 @@ export default defineConfig([
   {
     name: 'TypeScript rules',
     rules: {
-      '@local/check-license': 'error',
       curly: ['error', 'all'],
 
       'no-undef': 'off',

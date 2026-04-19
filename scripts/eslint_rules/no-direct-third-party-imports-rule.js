@@ -1,10 +1,4 @@
 /**
- * @license
- * Copyright 2026 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
-/**
  * ESLint rule that prevents value (non-type) imports of third-party packages
  * that should go through the `src/third_party/index.ts` barrel file.
  *

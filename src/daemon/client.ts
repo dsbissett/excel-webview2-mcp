@@ -1,9 +1,3 @@
-/**
- * @license
- * Copyright 2026 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import {spawn} from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';

@@ -1,9 +1,3 @@
-/**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import type * as puppeteer from './third_party/index.js';
 import type {DevTools} from './third_party/index.js';
 import {CDPSessionEvent} from './third_party/index.js';

@@ -1,9 +1,3 @@
-/**
- * @license
- * Copyright 2025 Google Inc.
- * SPDX-License-Identifier: Apache-2.0
- */
-
 export class Mutex {
   static Guard = class Guard {
     #mutex: Mutex;

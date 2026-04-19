@@ -1,10 +1,4 @@
 /**
- * @license
- * Copyright 2026 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
-/**
  * Converts a given string to snake_case.
  * This function handles camelCase, PascalCase, and acronyms, including transitions between letters and numbers.
  * It uses Unicode-aware regular expressions (`\p{L}`, `\p{N}`, `\p{Lu}`, `\p{Ll}` with the `u` flag)

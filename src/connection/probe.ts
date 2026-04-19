@@ -1,9 +1,3 @@
-/**
- * @license
- * Copyright 2026 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import type {ConnectionErrorReason} from './error.js';
 
 export type ProbeFailureReason = Exclude<

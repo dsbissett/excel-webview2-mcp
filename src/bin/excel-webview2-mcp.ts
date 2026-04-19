@@ -1,11 +1,5 @@
 #!/usr/bin/env node
 
-/**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
 process.title = 'excel-webview2-mcp';
 
 import {version} from 'node:process';

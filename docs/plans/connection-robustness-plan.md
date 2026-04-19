@@ -112,7 +112,7 @@ Evidence-backed findings from the current repo. Cite these rather than re-discov
 
 ### What to implement
 
-1. Add a small helper `probeCdpEndpoint(url: string, timeoutMs: number): Promise<{ok: boolean, version?: string, reason?: string}>` in a new file `src/connection/probe.ts`. License header required.
+1. Add a small helper `probeCdpEndpoint(url: string, timeoutMs: number): Promise<{ok: boolean, version?: string, reason?: string}>` in a new file `src/connection/probe.ts`.
    - GET `${url}/json/version` using Node's built-in `fetch` with `AbortSignal.timeout(timeoutMs)`.
    - Return `{ok: true, version: body.Browser}` on 2xx with parseable JSON.
    - Return `{ok: false, reason: 'unreachable' | 'timeout' | 'invalid-response' | 'http-error:<status>'}` otherwise.
@@ -228,7 +228,7 @@ Evidence-backed findings from the current repo. Cite these rather than re-discov
 
 ### What to implement
 
-1. Create `src/tools/connection.ts` (new file, license header required) exporting one tool:
+1. Create `src/tools/connection.ts` (new file) exporting one tool:
    - Name: `connection_status`, `category: ToolCategory.DEBUGGING` (or `EXCEL` if Phase 2 of the Excel-tooling plan has already landed).
    - Schema: `{ probe?: boolean }` — when true, re-run `probeCdpEndpoint` instead of returning the cached state.
    - Handler returns a JSON object:
@@ -249,8 +249,6 @@ Evidence-backed findings from the current repo. Cite these rather than re-discov
 
 - Tool pattern: [src/tools/snapshot.ts:12-41](../../src/tools/snapshot.ts#L12-L41) (handler shape).
 - Registration: existing imports and `...Object.values(...)` spread in `createTools()`.
-- License header: required — see any existing src/tools/\*.ts file for the exact text.
-
 ### Verification checklist
 
 - `npm run gen` regenerates `docs/tool-reference.md` with `connection_status`.
@@ -271,7 +269,7 @@ Evidence-backed findings from the current repo. Cite these rather than re-discov
 
 ### What to implement
 
-1. Create a dedicated `ConnectionError` class in `src/connection/error.ts` with fields `{url, reason, hint}` and a `.format()` method producing the canonical multi-line message. License header required.
+1. Create a dedicated `ConnectionError` class in `src/connection/error.ts` with fields `{url, reason, hint}` and a `.format()` method producing the canonical multi-line message.
 
 2. Replace the two generic throw sites:
    - [src/browser.ts:138-143](../../src/browser.ts#L138-L143)
@@ -370,7 +368,7 @@ Evidence-backed findings from the current repo. Cite these rather than re-discov
 
 ### Anti-pattern checks
 
-- Confirm every new `.ts` file has the Google LLC + SPDX license header.
+- Confirm new `.ts` files follow current repo conventions.
 - Confirm `docs/tool-reference.md` changes are purely the generator's work, not hand edits (`git diff --stat` should show a large regeneration diff, not surgical edits).
 - Confirm no new hardcoded `9222` literal was introduced — they should all route through `WEBVIEW2_DEBUG_URL`.
 

@@ -1,9 +1,3 @@
-/**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import assert from 'node:assert';
 import {describe, it, afterEach, beforeEach} from 'node:test';
 import zlib from 'node:zlib';

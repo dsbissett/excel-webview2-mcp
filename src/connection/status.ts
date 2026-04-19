@@ -1,9 +1,3 @@
-/**
- * @license
- * Copyright 2026 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import type {ProbeFailureReason, ProbeResult} from './probe.js';
 import {probeCdpEndpoint} from './probe.js';
 import {getSessionState, isSessionStale} from './session.js';

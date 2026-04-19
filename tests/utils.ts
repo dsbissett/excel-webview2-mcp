@@ -1,9 +1,3 @@
-/**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import assert from 'node:assert';
 import {spawn} from 'node:child_process';
 import path from 'node:path';

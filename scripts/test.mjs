@@ -1,9 +1,3 @@
-/**
- * @license
- * Copyright 2026 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
 // Note: can be converted to ts file once node 20 support is dropped.
 // Node 20 does not support --experimental-strip-types flag.
 

@@ -1,9 +1,3 @@
-/**
- * @license
- * Copyright 2026 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import type {WriteStream} from 'node:fs';
 import process from 'node:process';
 import readline from 'node:readline';

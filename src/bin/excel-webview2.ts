@@ -1,11 +1,5 @@
 #!/usr/bin/env node
 
-/**
- * @license
- * Copyright 2026 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
 process.title = 'excel-webview2';
 
 import process from 'node:process';

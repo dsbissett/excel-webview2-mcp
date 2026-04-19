@@ -1,9 +1,3 @@
-/**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import type {ParsedArguments} from '../bin/excel-webview2-mcp-cli-options.js';
 import type {McpPage} from '../McpPage.js';
 import {zod} from '../third_party/index.js';

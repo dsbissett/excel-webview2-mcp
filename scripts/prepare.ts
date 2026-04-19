@@ -1,9 +1,3 @@
-/**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import {readFileSync, writeFileSync} from 'node:fs';
 import {rm} from 'node:fs/promises';
 import {resolve} from 'node:path';
