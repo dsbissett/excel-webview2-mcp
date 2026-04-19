@@ -152,4 +152,9 @@ log.txt
 
 # Personal Claude Code files
 CLAUDE.local.md
+CLAUDE.md
 .claude/settings.local.json
+.claude/scheduled_tasks.lock
+
+# Planning / scratch docs
+docs/plans/
