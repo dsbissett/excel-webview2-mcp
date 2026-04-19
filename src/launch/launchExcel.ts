@@ -1,31 +1,24 @@
-import {
-  spawn,
-  type ChildProcess,
-  type ChildProcessWithoutNullStreams,
-} from 'node:child_process';
+import {spawn, type ChildProcessWithoutNullStreams} from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import {
-  probeCdpEndpoint,
-  type ProbeResult,
-} from '../connection/probe.js';
+import {probeCdpEndpoint, type ProbeResult} from '../connection/probe.js';
 
 import type {AddinProject} from './detectAddin.js';
 
-export type LaunchOptions = {
+export interface LaunchOptions {
   project: AddinProject;
   port?: number;
   extraBrowserArgs?: string[];
   timeoutMs?: number;
   signal?: AbortSignal;
-};
+}
 
-export type LaunchResult = {
+export interface LaunchResult {
   pid: number;
   cdpUrl: string;
   stop: () => Promise<void>;
-};
+}
 
 export type LaunchErrorReason =
   | 'unsupported-platform'
@@ -104,11 +97,11 @@ interface LaunchRuntimeState {
   tracked: Map<number, TrackedLaunch>;
 }
 
-type LaunchExcelTestingApi = {
+interface LaunchExcelTestingApi {
   launchExcel: (options: LaunchOptions) => Promise<LaunchResult>;
   getTrackedPids: () => number[];
   reset: () => void;
-};
+}
 
 const DEFAULT_CDP_PORT = 9222;
 const DEFAULT_TIMEOUT_MS = 60_000;
@@ -473,13 +466,14 @@ async function waitForCdpReady(options: {
   );
 }
 
-function throwIfAborted(signal: AbortSignal | undefined, output: string[]): void {
+function throwIfAborted(
+  signal: AbortSignal | undefined,
+  output: string[],
+): void {
   if (signal?.aborted) {
-    throw new LaunchError(
-      'aborted',
-      'Excel add-in launch was aborted.',
-      {output},
-    );
+    throw new LaunchError('aborted', 'Excel add-in launch was aborted.', {
+      output,
+    });
   }
 }
 
@@ -587,10 +581,7 @@ async function runLauncherCommand(
     );
   }
 
-  if (
-    timedResult.outcome.type !== 'close' ||
-    timedResult.outcome.code !== 0
-  ) {
+  if (timedResult.outcome.type !== 'close' || timedResult.outcome.code !== 0) {
     throw stopFailureFromOutcome(timedResult.outcome, output);
   }
 }

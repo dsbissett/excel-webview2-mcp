@@ -577,5 +577,52 @@
         "argType": "boolean"
       }
     ]
+  },
+  {
+    "name": "excel_detect_addin",
+    "args": [
+      {
+        "name": "cwd_length",
+        "argType": "number"
+      }
+    ]
+  },
+  {
+    "name": "excel_launch_addin",
+    "args": [
+      {
+        "name": "cwd_length",
+        "argType": "number"
+      },
+      {
+        "name": "port",
+        "argType": "number"
+      },
+      {
+        "name": "manifest_path_length",
+        "argType": "number"
+      },
+      {
+        "name": "extra_browser_args_count",
+        "argType": "number"
+      },
+      {
+        "name": "timeout_ms",
+        "argType": "number"
+      },
+      {
+        "name": "auto_connect",
+        "argType": "boolean"
+      }
+    ]
+  },
+  {
+    "name": "excel_stop_addin",
+    "args": [
+      {
+        "name": "manifest_path_length",
+        "argType": "number"
+      }
+    ]
   }
 ]

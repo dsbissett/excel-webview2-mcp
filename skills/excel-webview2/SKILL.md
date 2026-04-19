@@ -13,6 +13,33 @@ Before using any tools, the user must have their add-in running locally with the
 
 If tools fail to connect, verify the debuggable target is available: `curl http://localhost:9222/json/version`
 
+## Launching Excel from the agent
+
+When the user is working inside an Excel add-in repository, this server can launch Excel directly instead of asking them to run an `npm run start:cdp`-style script in another terminal. Three lifecycle tools cover the flow:
+
+- `excel_detect_addin` — inspects `cwd` (or a passed-in path) and reports whether it looks like an add-in repo. Detection signals: a `manifest.xml` (classic) or `manifest.json` (unified) at/above the working directory, plus signals from `package.json` (`office-addin-debugging` devDep, `--remote-debugging-port` in any script). Returns the detected `manifestPath`, `manifestKind`, `packageManager`, and any existing CDP-enabled script.
+- `excel_launch_addin` — spawns `office-addin-debugging start <manifest>` with `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=<port>` injected into the child process env. Polls the CDP endpoint until ready, then (by default, `autoConnect: true`) calls the connect path so subsequent tools work without an extra step. **Idempotent per manifest** — a second call returns the existing tracked launch instead of spawning a duplicate.
+- `excel_stop_addin` — runs `office-addin-debugging stop <manifest>` against the tracked launch (or all tracked launches when no `manifestPath` is given). Falls back to killing the child if stop does not exit cleanly.
+
+### Env-var contract
+
+The launcher only sets `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS` in the spawned child's environment — it does not mutate the user's shell. If that variable is **already** set in `process.env` and contains `--remote-debugging-port`, the launch refuses with `port-already-configured` rather than silently overwriting. Tell the user to unset it (or just run the tool without the manual env var).
+
+### When to suggest the launch tools
+
+Suggest `excel_launch_addin` when:
+
+- Connection tools fail because no CDP endpoint is up, AND
+- `excel_detect_addin` confirms the working directory is an Excel add-in repo.
+
+Do NOT suggest the launch tools on macOS/Linux — WebView2 is Windows-only and the launcher refuses with a platform error.
+
+The user's existing `start:cdp` npm script remains a valid manual alternative; the launch tools simply move that step into the agent loop. If the user prefers running the script themselves, just connect to the resulting endpoint.
+
+### Auto-launch at server startup
+
+The `--auto-launch` CLI flag runs `excel_launch_addin` once during MCP server startup if the working directory is detected as an add-in repo. `--launch-port` (default 9222) and `--launch-timeout` (default 60000ms) control the launch.
+
 ## Core Concepts
 
 **Connection**: The MCP server attaches to the WebView2 instance via the Chrome DevTools Protocol (CDP) at `http://localhost:9222`. No browser is launched.

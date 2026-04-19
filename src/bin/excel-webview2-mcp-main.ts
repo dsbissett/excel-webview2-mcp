@@ -3,10 +3,10 @@ import '../polyfill.js';
 import process from 'node:process';
 
 import {createMcpServer, logDisclaimers} from '../index.js';
+import {runAutoLaunch} from '../launch/runAutoLaunch.js';
 import {logger, saveLogsToFile} from '../logger.js';
 import {computeFlagUsage} from '../telemetry/flagUtils.js';
 import {StdioServerTransport} from '../third_party/index.js';
-import {runAutoLaunch} from '../tools/lifecycle.js';
 import {checkForUpdates} from '../utils/check-for-updates.js';
 import {VERSION} from '../version.js';
 

@@ -1,17 +1,17 @@
 import assert from 'node:assert';
-import * as child_process from 'node:child_process';
-import {ChildProcess} from 'node:child_process';
+import type * as child_process from 'node:child_process';
+import type {ChildProcess} from 'node:child_process';
 import {EventEmitter} from 'node:events';
 import {PassThrough} from 'node:stream';
 import {afterEach, beforeEach, describe, it} from 'node:test';
 
 import sinon from 'sinon';
 
+import type {AddinProject} from '../../src/launch/detectAddin.js';
 import {
   createLaunchExcelForTesting,
   LaunchError,
 } from '../../src/launch/launchExcel.js';
-import type {AddinProject} from '../../src/launch/detectAddin.js';
 
 class FakeProcess extends EventEmitter {
   env: NodeJS.ProcessEnv;
@@ -169,7 +169,9 @@ describe('launchExcel', () => {
       sleep: async (ms: number) => {
         if (ms === 10_000) {
           stopChild.close(0);
-          return new Promise(() => {});
+          return new Promise<void>(() => {
+            // never resolves — simulates a hung stop call
+          });
         }
         clockMs += ms;
       },
@@ -429,7 +431,9 @@ describe('launchExcel', () => {
       processRef: fakeProcess,
       sleep: async (ms: number) => {
         if (ms === 10_000) {
-          return new Promise(() => {});
+          return new Promise<void>(() => {
+            // never resolves — simulates a hung stop call
+          });
         }
         clockMs += ms;
       },

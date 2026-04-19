@@ -185,6 +185,30 @@ claude mcp add excel-webview2 --scope user npx @dsbissett/excel-webview2-mcp@lat
 This bypasses the git clone entirely and uses npm/npx to fetch the package. Note
 that this method installs only the MCP server without the bundled skills.
 
+### `excel_launch_addin` fails with `launcher-missing`
+
+The launch tool resolves `office-addin-debugging` from the project's local `node_modules/.bin` first, then falls back to `npx --no-install`. If neither is available, the launch refuses rather than auto-installing. Add it as a devDependency in the add-in repo:
+
+```sh
+npm install --save-dev office-addin-debugging
+```
+
+### `excel_launch_addin` fails with `port-already-configured`
+
+`WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS` is already set in your shell with `--remote-debugging-port`, and the launch tool refuses to silently overwrite it. Either unset that variable and let the tool manage it, or skip the launch tool and rely on whatever process you already started under that env var.
+
+```powershell
+Remove-Item Env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS
+```
+
+### `excel_launch_addin` fails with `cdp-not-ready`
+
+The launcher started Excel but the CDP endpoint never came up before the timeout. Common causes:
+
+- First-time sideload prompts (Excel asks the user to trust the manifest) block before WebView2 starts. Click through the prompt, then re-run.
+- The dev server inside `office-addin-debugging start` is still building. Increase `--launch-timeout` (default 60000ms) or pass a larger `timeoutMs` to the tool.
+- Excel was already running under a non-debug profile. Close all Excel windows and try again.
+
 ### Connection timeouts with `--autoConnect`
 
 If you are using the `--autoConnect` flag and tools like `list_pages`, `new_page`, or `navigate_page` fail with a timeout (e.g., `ProtocolError: Network.enable timed out` or `The socket connection was closed unexpectedly`), this usually means the MCP server cannot handshake with the running Chrome instance correctly. Ensure:

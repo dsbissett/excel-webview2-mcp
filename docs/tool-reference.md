@@ -1,6 +1,6 @@
 <!-- AUTO GENERATED DO NOT EDIT - run 'npm run gen' to update-->
 
-# Excel WebView2 MCP Tool Reference (~6357 cl100k_base tokens)
+# Excel WebView2 MCP Tool Reference (~6915 cl100k_base tokens)
 
 - **[Input automation](#input-automation)** (9 tools)
   - [`click`](#click)
@@ -38,6 +38,10 @@
   - [`list_console_messages`](#list_console_messages)
   - [`take_screenshot`](#take_screenshot)
   - [`take_snapshot`](#take_snapshot)
+- **[Add-in lifecycle](#add-in-lifecycle)** (3 tools)
+  - [`excel_detect_addin`](#excel_detect_addin)
+  - [`excel_launch_addin`](#excel_launch_addin)
+  - [`excel_stop_addin`](#excel_stop_addin)
 
 ## Input automation
 
@@ -158,7 +162,7 @@
 
 ### `list_pages`
 
-**Description:** Get a list of pages open in the browser.
+**Description:** Get a list of pages  open in the browser.
 
 **Parameters:** None
 
@@ -312,12 +316,12 @@ so returned values have to be JSON-serializable.
 **Parameters:**
 
 - **function** (string) **(required)**: A JavaScript function declaration to be executed by the tool in the currently selected page.
-  Example without arguments: `() => {
+Example without arguments: `() => {
   return document.title
 }` or `async () => {
   return await fetch("example.com")
 }`.
-  Example with arguments: `(el) => {
+Example with arguments: `(el) => {
   return el.innerText;
 }`
 
@@ -384,5 +388,42 @@ in the DevTools Elements panel (if any).
 
 - **filePath** (string) _(optional)_: The absolute path, or a path relative to the current working directory, to save the snapshot to instead of attaching it to the response.
 - **verbose** (boolean) _(optional)_: Whether to include all possible information available in the full a11y tree. Default is false.
+
+---
+
+## Add-in lifecycle
+
+### `excel_detect_addin`
+
+**Description:** Inspects a working directory and reports whether it looks like an Excel add-in project (manifest location, manifest kind, package manager, and any existing remote-debugging script).
+
+**Parameters:**
+
+- **cwd** (string) _(optional)_: Directory to inspect. Defaults to the MCP server working directory.
+
+---
+
+### `excel_launch_addin`
+
+**Description:** Launches Excel with the detected add-in and WebView2 remote debugging enabled. Idempotent per manifest path: re-calling returns the tracked launch instead of spawning a duplicate.
+
+**Parameters:**
+
+- **autoConnect** (boolean) _(optional)_
+- **cwd** (string) _(optional)_
+- **extraBrowserArgs** (array) _(optional)_
+- **manifestPath** (string) _(optional)_
+- **port** (integer) _(optional)_
+- **timeoutMs** (integer) _(optional)_
+
+---
+
+### `excel_stop_addin`
+
+**Description:** Stops the most recent Excel add-in launched by [`excel_launch_addin`](#excel_launch_addin) (or a specific manifest). Runs office-addin-debugging stop and kills the process if it does not exit cleanly.
+
+**Parameters:**
+
+- **manifestPath** (string) _(optional)_
 
 ---

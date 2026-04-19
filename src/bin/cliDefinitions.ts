@@ -13,598 +13,619 @@ export type Commands = Record<
   {
     description: string;
     category: string;
-    args: Record<string, ArgDef>;
+    args: Record<string, ArgDef>
   }
 >;
 export const commands: Commands = {
-  click: {
-    description: 'Clicks on the provided element',
-    category: 'Input automation',
-    args: {
-      uid: {
-        name: 'uid',
-        type: 'string',
-        description:
-          'The uid of an element on the page from the page content snapshot',
-        required: true,
+  "click": {
+    "description": "Clicks on the provided element",
+    "category": "Input automation",
+    "args": {
+      "uid": {
+        "name": "uid",
+        "type": "string",
+        "description": "The uid of an element on the page from the page content snapshot",
+        "required": true
       },
-      dblClick: {
-        name: 'dblClick',
-        type: 'boolean',
-        description: 'Set to true for double clicks. Default is false.',
-        required: false,
+      "dblClick": {
+        "name": "dblClick",
+        "type": "boolean",
+        "description": "Set to true for double clicks. Default is false.",
+        "required": false
       },
-      includeSnapshot: {
-        name: 'includeSnapshot',
-        type: 'boolean',
-        description:
-          'Whether to include a snapshot in the response. Default is false.',
-        required: false,
-      },
-    },
+      "includeSnapshot": {
+        "name": "includeSnapshot",
+        "type": "boolean",
+        "description": "Whether to include a snapshot in the response. Default is false.",
+        "required": false
+      }
+    }
   },
-  close_page: {
-    description:
-      'Closes the page by its index. The last open page cannot be closed.',
-    category: 'Navigation automation',
-    args: {
-      pageId: {
-        name: 'pageId',
-        type: 'number',
-        description:
-          'The ID of the page to close. Call list_pages to list pages.',
-        required: true,
-      },
-    },
+  "close_page": {
+    "description": "Closes the page by its index. The last open page cannot be closed.",
+    "category": "Navigation automation",
+    "args": {
+      "pageId": {
+        "name": "pageId",
+        "type": "number",
+        "description": "The ID of the page to close. Call list_pages to list pages.",
+        "required": true
+      }
+    }
   },
-  connection_status: {
-    description:
-      'Reports whether the server is currently attached to a browser and which CDP endpoint it is tracking.',
-    category: 'Debugging',
-    args: {
-      probe: {
-        name: 'probe',
-        type: 'boolean',
-        description:
-          'If true, re-runs the CDP /json/version probe for the tracked endpoint instead of returning cached probe state.',
-        required: false,
-      },
-    },
+  "connection_status": {
+    "description": "Reports whether the server is currently attached to a browser and which CDP endpoint it is tracking.",
+    "category": "Debugging",
+    "args": {
+      "probe": {
+        "name": "probe",
+        "type": "boolean",
+        "description": "If true, re-runs the CDP /json/version probe for the tracked endpoint instead of returning cached probe state.",
+        "required": false
+      }
+    }
   },
-  drag: {
-    description: 'Drag an element onto another element',
-    category: 'Input automation',
-    args: {
-      from_uid: {
-        name: 'from_uid',
-        type: 'string',
-        description: 'The uid of the element to drag',
-        required: true,
+  "drag": {
+    "description": "Drag an element onto another element",
+    "category": "Input automation",
+    "args": {
+      "from_uid": {
+        "name": "from_uid",
+        "type": "string",
+        "description": "The uid of the element to drag",
+        "required": true
       },
-      to_uid: {
-        name: 'to_uid',
-        type: 'string',
-        description: 'The uid of the element to drop into',
-        required: true,
+      "to_uid": {
+        "name": "to_uid",
+        "type": "string",
+        "description": "The uid of the element to drop into",
+        "required": true
       },
-      includeSnapshot: {
-        name: 'includeSnapshot',
-        type: 'boolean',
-        description:
-          'Whether to include a snapshot in the response. Default is false.',
-        required: false,
-      },
-    },
+      "includeSnapshot": {
+        "name": "includeSnapshot",
+        "type": "boolean",
+        "description": "Whether to include a snapshot in the response. Default is false.",
+        "required": false
+      }
+    }
   },
-  emulate: {
-    description: 'Throttles network and/or CPU on the selected page.',
-    category: 'Emulation',
-    args: {
-      networkConditions: {
-        name: 'networkConditions',
-        type: 'string',
-        description: 'Throttle network. Omit to disable throttling.',
-        required: false,
-        enum: ['Offline', 'Slow 3G', 'Fast 3G', 'Slow 4G', 'Fast 4G'],
+  "emulate": {
+    "description": "Throttles network and/or CPU on the selected page.",
+    "category": "Emulation",
+    "args": {
+      "networkConditions": {
+        "name": "networkConditions",
+        "type": "string",
+        "description": "Throttle network. Omit to disable throttling.",
+        "required": false,
+        "enum": [
+          "Offline",
+          "Slow 3G",
+          "Fast 3G",
+          "Slow 4G",
+          "Fast 4G"
+        ]
       },
-      cpuThrottlingRate: {
-        name: 'cpuThrottlingRate',
-        type: 'number',
-        description:
-          'Represents the CPU slowdown factor. Omit or set the rate to 1 to disable throttling',
-        required: false,
-      },
-    },
+      "cpuThrottlingRate": {
+        "name": "cpuThrottlingRate",
+        "type": "number",
+        "description": "Represents the CPU slowdown factor. Omit or set the rate to 1 to disable throttling",
+        "required": false
+      }
+    }
   },
-  evaluate_script: {
-    description:
-      'Evaluate a JavaScript function inside the currently selected page. Returns the response as JSON,\nso returned values have to be JSON-serializable.',
-    category: 'Debugging',
-    args: {
-      function: {
-        name: 'function',
-        type: 'string',
-        description:
-          'A JavaScript function declaration to be executed by the tool in the currently selected page.\nExample without arguments: `() => {\n  return document.title\n}` or `async () => {\n  return await fetch("example.com")\n}`.\nExample with arguments: `(el) => {\n  return el.innerText;\n}`\n',
-        required: true,
+  "evaluate_script": {
+    "description": "Evaluate a JavaScript function inside the currently selected page. Returns the response as JSON,\nso returned values have to be JSON-serializable.",
+    "category": "Debugging",
+    "args": {
+      "function": {
+        "name": "function",
+        "type": "string",
+        "description": "A JavaScript function declaration to be executed by the tool in the currently selected page.\nExample without arguments: `() => {\n  return document.title\n}` or `async () => {\n  return await fetch(\"example.com\")\n}`.\nExample with arguments: `(el) => {\n  return el.innerText;\n}`\n",
+        "required": true
       },
-      args: {
-        name: 'args',
-        type: 'array',
-        description: 'An optional list of arguments to pass to the function.',
-        required: false,
-      },
-    },
+      "args": {
+        "name": "args",
+        "type": "array",
+        "description": "An optional list of arguments to pass to the function.",
+        "required": false
+      }
+    }
   },
-  excel_active_range: {
-    description:
-      'Returns the currently selected Excel range (address, dimensions, and values). Optionally includes formulas and number formats. Requires an Excel add-in target with Excel.run available.',
-    category: 'Excel',
-    args: {
-      includeFormulas: {
-        name: 'includeFormulas',
-        type: 'boolean',
-        description:
-          'If true, also return the A1-style formulas for each cell.',
-        required: false,
+  "excel_active_range": {
+    "description": "Returns the currently selected Excel range (address, dimensions, and values). Optionally includes formulas and number formats. Requires an Excel add-in target with Excel.run available.",
+    "category": "Excel",
+    "args": {
+      "includeFormulas": {
+        "name": "includeFormulas",
+        "type": "boolean",
+        "description": "If true, also return the A1-style formulas for each cell.",
+        "required": false
       },
-      includeNumberFormat: {
-        name: 'includeNumberFormat',
-        type: 'boolean',
-        description:
-          'If true, also return the Excel number-format code per cell.',
-        required: false,
-      },
-    },
+      "includeNumberFormat": {
+        "name": "includeNumberFormat",
+        "type": "boolean",
+        "description": "If true, also return the Excel number-format code per cell.",
+        "required": false
+      }
+    }
   },
-  excel_context_info: {
-    description:
-      'Returns Office.js and Excel host information for the selected page, including supported requirement sets when available.',
-    category: 'Excel',
-    args: {},
+  "excel_context_info": {
+    "description": "Returns Office.js and Excel host information for the selected page, including supported requirement sets when available.",
+    "category": "Excel",
+    "args": {}
   },
-  fill: {
-    description:
-      'Type text into an input, text area or select an option from a <select> element.',
-    category: 'Input automation',
-    args: {
-      uid: {
-        name: 'uid',
-        type: 'string',
-        description:
-          'The uid of an element on the page from the page content snapshot',
-        required: true,
-      },
-      value: {
-        name: 'value',
-        type: 'string',
-        description: 'The value to fill in',
-        required: true,
-      },
-      includeSnapshot: {
-        name: 'includeSnapshot',
-        type: 'boolean',
-        description:
-          'Whether to include a snapshot in the response. Default is false.',
-        required: false,
-      },
-    },
+  "excel_detect_addin": {
+    "description": "Inspects a working directory and reports whether it looks like an Excel add-in project (manifest location, manifest kind, package manager, and any existing remote-debugging script).",
+    "category": "Add-in lifecycle",
+    "args": {
+      "cwd": {
+        "name": "cwd",
+        "type": "string",
+        "description": "Directory to inspect. Defaults to the MCP server working directory.",
+        "required": false
+      }
+    }
   },
-  get_console_message: {
-    description:
-      'Gets a console message by its ID. You can get all messages by calling list_console_messages.',
-    category: 'Debugging',
-    args: {
-      msgid: {
-        name: 'msgid',
-        type: 'number',
-        description:
-          'The msgid of a console message on the page from the listed console messages',
-        required: true,
+  "excel_launch_addin": {
+    "description": "Launches Excel with the detected add-in and WebView2 remote debugging enabled. Idempotent per manifest path: re-calling returns the tracked launch instead of spawning a duplicate.",
+    "category": "Add-in lifecycle",
+    "args": {
+      "cwd": {
+        "name": "cwd",
+        "type": "string",
+        "description": "",
+        "required": false
       },
-    },
+      "port": {
+        "name": "port",
+        "type": "integer",
+        "description": "",
+        "required": false
+      },
+      "manifestPath": {
+        "name": "manifestPath",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      "extraBrowserArgs": {
+        "name": "extraBrowserArgs",
+        "type": "array",
+        "description": "",
+        "required": false
+      },
+      "timeoutMs": {
+        "name": "timeoutMs",
+        "type": "integer",
+        "description": "",
+        "required": false
+      },
+      "autoConnect": {
+        "name": "autoConnect",
+        "type": "boolean",
+        "description": "",
+        "required": false
+      }
+    }
   },
-  get_network_request: {
-    description:
-      'Gets a network request by an optional reqid, if omitted returns the currently selected request in the DevTools Network panel.',
-    category: 'Network',
-    args: {
-      reqid: {
-        name: 'reqid',
-        type: 'number',
-        description:
-          'The reqid of the network request. If omitted returns the currently selected request in the DevTools Network panel.',
-        required: false,
-      },
-      requestFilePath: {
-        name: 'requestFilePath',
-        type: 'string',
-        description:
-          'The absolute or relative path to save the request body to. If omitted, the body is returned inline.',
-        required: false,
-      },
-      responseFilePath: {
-        name: 'responseFilePath',
-        type: 'string',
-        description:
-          'The absolute or relative path to save the response body to. If omitted, the body is returned inline.',
-        required: false,
-      },
-    },
+  "excel_stop_addin": {
+    "description": "Stops the most recent Excel add-in launched by excel_launch_addin (or a specific manifest). Runs office-addin-debugging stop and kills the process if it does not exit cleanly.",
+    "category": "Add-in lifecycle",
+    "args": {
+      "manifestPath": {
+        "name": "manifestPath",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    }
   },
-  handle_dialog: {
-    description:
-      'If a browser dialog was opened, use this command to handle it',
-    category: 'Input automation',
-    args: {
-      action: {
-        name: 'action',
-        type: 'string',
-        description: 'Whether to dismiss or accept the dialog',
-        required: true,
-        enum: ['accept', 'dismiss'],
+  "fill": {
+    "description": "Type text into an input, text area or select an option from a <select> element.",
+    "category": "Input automation",
+    "args": {
+      "uid": {
+        "name": "uid",
+        "type": "string",
+        "description": "The uid of an element on the page from the page content snapshot",
+        "required": true
       },
-      promptText: {
-        name: 'promptText',
-        type: 'string',
-        description: 'Optional prompt text to enter into the dialog.',
-        required: false,
+      "value": {
+        "name": "value",
+        "type": "string",
+        "description": "The value to fill in",
+        "required": true
       },
-    },
+      "includeSnapshot": {
+        "name": "includeSnapshot",
+        "type": "boolean",
+        "description": "Whether to include a snapshot in the response. Default is false.",
+        "required": false
+      }
+    }
   },
-  hover: {
-    description: 'Hover over the provided element',
-    category: 'Input automation',
-    args: {
-      uid: {
-        name: 'uid',
-        type: 'string',
-        description:
-          'The uid of an element on the page from the page content snapshot',
-        required: true,
-      },
-      includeSnapshot: {
-        name: 'includeSnapshot',
-        type: 'boolean',
-        description:
-          'Whether to include a snapshot in the response. Default is false.',
-        required: false,
-      },
-    },
+  "get_console_message": {
+    "description": "Gets a console message by its ID. You can get all messages by calling list_console_messages.",
+    "category": "Debugging",
+    "args": {
+      "msgid": {
+        "name": "msgid",
+        "type": "number",
+        "description": "The msgid of a console message on the page from the listed console messages",
+        "required": true
+      }
+    }
   },
-  lighthouse_audit: {
-    description:
-      'Get Lighthouse score and reports for accessibility, SEO and best practices. This excludes performance. For performance audits, run performance_start_trace',
-    category: 'Debugging',
-    args: {
-      mode: {
-        name: 'mode',
-        type: 'string',
-        description:
-          '"navigation" reloads & audits. "snapshot" analyzes current state.',
-        required: false,
-        default: 'navigation',
-        enum: ['navigation', 'snapshot'],
+  "get_network_request": {
+    "description": "Gets a network request by an optional reqid, if omitted returns the currently selected request in the DevTools Network panel.",
+    "category": "Network",
+    "args": {
+      "reqid": {
+        "name": "reqid",
+        "type": "number",
+        "description": "The reqid of the network request. If omitted returns the currently selected request in the DevTools Network panel.",
+        "required": false
       },
-      device: {
-        name: 'device',
-        type: 'string',
-        description: 'Device to emulate.',
-        required: false,
-        default: 'desktop',
-        enum: ['desktop', 'mobile'],
+      "requestFilePath": {
+        "name": "requestFilePath",
+        "type": "string",
+        "description": "The absolute or relative path to save the request body to. If omitted, the body is returned inline.",
+        "required": false
       },
-      outputDirPath: {
-        name: 'outputDirPath',
-        type: 'string',
-        description: 'Directory for reports. If omitted, uses temporary files.',
-        required: false,
-      },
-    },
+      "responseFilePath": {
+        "name": "responseFilePath",
+        "type": "string",
+        "description": "The absolute or relative path to save the response body to. If omitted, the body is returned inline.",
+        "required": false
+      }
+    }
   },
-  list_console_messages: {
-    description:
-      'List all console messages for the currently selected page since the last navigation.',
-    category: 'Debugging',
-    args: {
-      pageSize: {
-        name: 'pageSize',
-        type: 'integer',
-        description:
-          'Maximum number of messages to return. When omitted, returns all messages.',
-        required: false,
+  "handle_dialog": {
+    "description": "If a browser dialog was opened, use this command to handle it",
+    "category": "Input automation",
+    "args": {
+      "action": {
+        "name": "action",
+        "type": "string",
+        "description": "Whether to dismiss or accept the dialog",
+        "required": true,
+        "enum": [
+          "accept",
+          "dismiss"
+        ]
       },
-      pageIdx: {
-        name: 'pageIdx',
-        type: 'integer',
-        description:
-          'Page number to return (0-based). When omitted, returns the first page.',
-        required: false,
-      },
-      types: {
-        name: 'types',
-        type: 'array',
-        description:
-          'Filter messages to only return messages of the specified resource types. When omitted or empty, returns all messages.',
-        required: false,
-      },
-      includePreservedMessages: {
-        name: 'includePreservedMessages',
-        type: 'boolean',
-        description:
-          'Set to true to return the preserved messages over the last 3 navigations.',
-        required: false,
-        default: false,
-      },
-    },
+      "promptText": {
+        "name": "promptText",
+        "type": "string",
+        "description": "Optional prompt text to enter into the dialog.",
+        "required": false
+      }
+    }
   },
-  list_network_requests: {
-    description:
-      'List all requests for the currently selected page since the last navigation.',
-    category: 'Network',
-    args: {
-      pageSize: {
-        name: 'pageSize',
-        type: 'integer',
-        description:
-          'Maximum number of requests to return. When omitted, returns all requests.',
-        required: false,
+  "hover": {
+    "description": "Hover over the provided element",
+    "category": "Input automation",
+    "args": {
+      "uid": {
+        "name": "uid",
+        "type": "string",
+        "description": "The uid of an element on the page from the page content snapshot",
+        "required": true
       },
-      pageIdx: {
-        name: 'pageIdx',
-        type: 'integer',
-        description:
-          'Page number to return (0-based). When omitted, returns the first page.',
-        required: false,
-      },
-      resourceTypes: {
-        name: 'resourceTypes',
-        type: 'array',
-        description:
-          'Filter requests to only return requests of the specified resource types. When omitted or empty, returns all requests.',
-        required: false,
-      },
-      includePreservedRequests: {
-        name: 'includePreservedRequests',
-        type: 'boolean',
-        description:
-          'Set to true to return the preserved requests over the last 3 navigations.',
-        required: false,
-        default: false,
-      },
-    },
+      "includeSnapshot": {
+        "name": "includeSnapshot",
+        "type": "boolean",
+        "description": "Whether to include a snapshot in the response. Default is false.",
+        "required": false
+      }
+    }
   },
-  list_pages: {
-    description: 'Get a list of pages  open in the browser.',
-    category: 'Navigation automation',
-    args: {},
+  "lighthouse_audit": {
+    "description": "Get Lighthouse score and reports for accessibility, SEO and best practices. This excludes performance. For performance audits, run performance_start_trace",
+    "category": "Debugging",
+    "args": {
+      "mode": {
+        "name": "mode",
+        "type": "string",
+        "description": "\"navigation\" reloads & audits. \"snapshot\" analyzes current state.",
+        "required": false,
+        "default": "navigation",
+        "enum": [
+          "navigation",
+          "snapshot"
+        ]
+      },
+      "device": {
+        "name": "device",
+        "type": "string",
+        "description": "Device to emulate.",
+        "required": false,
+        "default": "desktop",
+        "enum": [
+          "desktop",
+          "mobile"
+        ]
+      },
+      "outputDirPath": {
+        "name": "outputDirPath",
+        "type": "string",
+        "description": "Directory for reports. If omitted, uses temporary files.",
+        "required": false
+      }
+    }
   },
-  performance_analyze_insight: {
-    description:
-      'Provides more detailed information on a specific Performance Insight of an insight set that was highlighted in the results of a trace recording.',
-    category: 'Performance',
-    args: {
-      insightSetId: {
-        name: 'insightSetId',
-        type: 'string',
-        description:
-          'The id for the specific insight set. Only use the ids given in the "Available insight sets" list.',
-        required: true,
+  "list_console_messages": {
+    "description": "List all console messages for the currently selected page since the last navigation.",
+    "category": "Debugging",
+    "args": {
+      "pageSize": {
+        "name": "pageSize",
+        "type": "integer",
+        "description": "Maximum number of messages to return. When omitted, returns all messages.",
+        "required": false
       },
-      insightName: {
-        name: 'insightName',
-        type: 'string',
-        description:
-          'The name of the Insight you want more information on. For example: "DocumentLatency" or "LCPBreakdown"',
-        required: true,
+      "pageIdx": {
+        "name": "pageIdx",
+        "type": "integer",
+        "description": "Page number to return (0-based). When omitted, returns the first page.",
+        "required": false
       },
-    },
+      "types": {
+        "name": "types",
+        "type": "array",
+        "description": "Filter messages to only return messages of the specified resource types. When omitted or empty, returns all messages.",
+        "required": false
+      },
+      "includePreservedMessages": {
+        "name": "includePreservedMessages",
+        "type": "boolean",
+        "description": "Set to true to return the preserved messages over the last 3 navigations.",
+        "required": false,
+        "default": false
+      }
+    }
   },
-  performance_start_trace: {
-    description:
-      'Start a performance trace on the selected webpage. Use to find frontend performance issues, Core Web Vitals (LCP, INP, CLS), and improve page load speed.',
-    category: 'Performance',
-    args: {
-      reload: {
-        name: 'reload',
-        type: 'boolean',
-        description:
-          'Determines if, once tracing has started, the current selected page should be automatically reloaded.',
-        required: false,
-        default: true,
+  "list_network_requests": {
+    "description": "List all requests for the currently selected page since the last navigation.",
+    "category": "Network",
+    "args": {
+      "pageSize": {
+        "name": "pageSize",
+        "type": "integer",
+        "description": "Maximum number of requests to return. When omitted, returns all requests.",
+        "required": false
       },
-      autoStop: {
-        name: 'autoStop',
-        type: 'boolean',
-        description:
-          'Determines if the trace recording should be automatically stopped.',
-        required: false,
-        default: true,
+      "pageIdx": {
+        "name": "pageIdx",
+        "type": "integer",
+        "description": "Page number to return (0-based). When omitted, returns the first page.",
+        "required": false
       },
-      filePath: {
-        name: 'filePath',
-        type: 'string',
-        description:
-          'The absolute file path, or a file path relative to the current working directory, to save the raw trace data. For example, trace.json.gz (compressed) or trace.json (uncompressed).',
-        required: false,
+      "resourceTypes": {
+        "name": "resourceTypes",
+        "type": "array",
+        "description": "Filter requests to only return requests of the specified resource types. When omitted or empty, returns all requests.",
+        "required": false
       },
-    },
+      "includePreservedRequests": {
+        "name": "includePreservedRequests",
+        "type": "boolean",
+        "description": "Set to true to return the preserved requests over the last 3 navigations.",
+        "required": false,
+        "default": false
+      }
+    }
   },
-  performance_stop_trace: {
-    description:
-      'Stop the active performance trace recording on the selected webpage.',
-    category: 'Performance',
-    args: {
-      filePath: {
-        name: 'filePath',
-        type: 'string',
-        description:
-          'The absolute file path, or a file path relative to the current working directory, to save the raw trace data. For example, trace.json.gz (compressed) or trace.json (uncompressed).',
-        required: false,
-      },
-    },
+  "list_pages": {
+    "description": "Get a list of pages  open in the browser.",
+    "category": "Navigation automation",
+    "args": {}
   },
-  press_key: {
-    description:
-      'Press a key or key combination. Use this when other input methods like fill() cannot be used (e.g., keyboard shortcuts, navigation keys, or special key combinations).',
-    category: 'Input automation',
-    args: {
-      key: {
-        name: 'key',
-        type: 'string',
-        description:
-          'A key or a combination (e.g., "Enter", "Control+A", "Control++", "Control+Shift+R"). Modifiers: Control, Shift, Alt, Meta',
-        required: true,
+  "performance_analyze_insight": {
+    "description": "Provides more detailed information on a specific Performance Insight of an insight set that was highlighted in the results of a trace recording.",
+    "category": "Performance",
+    "args": {
+      "insightSetId": {
+        "name": "insightSetId",
+        "type": "string",
+        "description": "The id for the specific insight set. Only use the ids given in the \"Available insight sets\" list.",
+        "required": true
       },
-      includeSnapshot: {
-        name: 'includeSnapshot',
-        type: 'boolean',
-        description:
-          'Whether to include a snapshot in the response. Default is false.',
-        required: false,
-      },
-    },
+      "insightName": {
+        "name": "insightName",
+        "type": "string",
+        "description": "The name of the Insight you want more information on. For example: \"DocumentLatency\" or \"LCPBreakdown\"",
+        "required": true
+      }
+    }
   },
-  select_page: {
-    description: 'Select a page as a context for future tool calls.',
-    category: 'Navigation automation',
-    args: {
-      pageId: {
-        name: 'pageId',
-        type: 'number',
-        description:
-          'The ID of the page to select. Call list_pages to get available pages.',
-        required: true,
+  "performance_start_trace": {
+    "description": "Start a performance trace on the selected webpage. Use to find frontend performance issues, Core Web Vitals (LCP, INP, CLS), and improve page load speed.",
+    "category": "Performance",
+    "args": {
+      "reload": {
+        "name": "reload",
+        "type": "boolean",
+        "description": "Determines if, once tracing has started, the current selected page should be automatically reloaded.",
+        "required": false,
+        "default": true
       },
-      bringToFront: {
-        name: 'bringToFront',
-        type: 'boolean',
-        description: 'Whether to focus the page and bring it to the top.',
-        required: false,
+      "autoStop": {
+        "name": "autoStop",
+        "type": "boolean",
+        "description": "Determines if the trace recording should be automatically stopped.",
+        "required": false,
+        "default": true
       },
-    },
+      "filePath": {
+        "name": "filePath",
+        "type": "string",
+        "description": "The absolute file path, or a file path relative to the current working directory, to save the raw trace data. For example, trace.json.gz (compressed) or trace.json (uncompressed).",
+        "required": false
+      }
+    }
   },
-  take_memory_snapshot: {
-    description:
-      'Capture a heap snapshot of the currently selected page. Use to analyze the memory distribution of JavaScript objects and debug memory leaks.',
-    category: 'Performance',
-    args: {
-      filePath: {
-        name: 'filePath',
-        type: 'string',
-        description:
-          'A path to a .heapsnapshot file to save the heapsnapshot to.',
-        required: true,
-      },
-    },
+  "performance_stop_trace": {
+    "description": "Stop the active performance trace recording on the selected webpage.",
+    "category": "Performance",
+    "args": {
+      "filePath": {
+        "name": "filePath",
+        "type": "string",
+        "description": "The absolute file path, or a file path relative to the current working directory, to save the raw trace data. For example, trace.json.gz (compressed) or trace.json (uncompressed).",
+        "required": false
+      }
+    }
   },
-  take_screenshot: {
-    description: 'Take a screenshot of the page or element.',
-    category: 'Debugging',
-    args: {
-      format: {
-        name: 'format',
-        type: 'string',
-        description:
-          'Type of format to save the screenshot as. Default is "png"',
-        required: false,
-        default: 'png',
-        enum: ['png', 'jpeg', 'webp'],
+  "press_key": {
+    "description": "Press a key or key combination. Use this when other input methods like fill() cannot be used (e.g., keyboard shortcuts, navigation keys, or special key combinations).",
+    "category": "Input automation",
+    "args": {
+      "key": {
+        "name": "key",
+        "type": "string",
+        "description": "A key or a combination (e.g., \"Enter\", \"Control+A\", \"Control++\", \"Control+Shift+R\"). Modifiers: Control, Shift, Alt, Meta",
+        "required": true
       },
-      quality: {
-        name: 'quality',
-        type: 'number',
-        description:
-          'Compression quality for JPEG and WebP formats (0-100). Higher values mean better quality but larger file sizes. Ignored for PNG format.',
-        required: false,
-      },
-      uid: {
-        name: 'uid',
-        type: 'string',
-        description:
-          'The uid of an element on the page from the page content snapshot. If omitted, takes a page screenshot.',
-        required: false,
-      },
-      fullPage: {
-        name: 'fullPage',
-        type: 'boolean',
-        description:
-          'If set to true takes a screenshot of the full page instead of the currently visible viewport. Incompatible with uid.',
-        required: false,
-      },
-      filePath: {
-        name: 'filePath',
-        type: 'string',
-        description:
-          'The absolute path, or a path relative to the current working directory, to save the screenshot to instead of attaching it to the response.',
-        required: false,
-      },
-    },
+      "includeSnapshot": {
+        "name": "includeSnapshot",
+        "type": "boolean",
+        "description": "Whether to include a snapshot in the response. Default is false.",
+        "required": false
+      }
+    }
   },
-  take_snapshot: {
-    description:
-      'Take a text snapshot of the currently selected page based on the a11y tree. The snapshot lists page elements along with a unique\nidentifier (uid). Always use the latest snapshot. Prefer taking a snapshot over taking a screenshot. The snapshot indicates the element selected\nin the DevTools Elements panel (if any).',
-    category: 'Debugging',
-    args: {
-      verbose: {
-        name: 'verbose',
-        type: 'boolean',
-        description:
-          'Whether to include all possible information available in the full a11y tree. Default is false.',
-        required: false,
+  "select_page": {
+    "description": "Select a page as a context for future tool calls.",
+    "category": "Navigation automation",
+    "args": {
+      "pageId": {
+        "name": "pageId",
+        "type": "number",
+        "description": "The ID of the page to select. Call list_pages to get available pages.",
+        "required": true
       },
-      filePath: {
-        name: 'filePath',
-        type: 'string',
-        description:
-          'The absolute path, or a path relative to the current working directory, to save the snapshot to instead of attaching it to the response.',
-        required: false,
-      },
-    },
+      "bringToFront": {
+        "name": "bringToFront",
+        "type": "boolean",
+        "description": "Whether to focus the page and bring it to the top.",
+        "required": false
+      }
+    }
   },
-  type_text: {
-    description: 'Type text using keyboard into a previously focused input',
-    category: 'Input automation',
-    args: {
-      text: {
-        name: 'text',
-        type: 'string',
-        description: 'The text to type',
-        required: true,
-      },
-      submitKey: {
-        name: 'submitKey',
-        type: 'string',
-        description:
-          'Optional key to press after typing. E.g., "Enter", "Tab", "Escape"',
-        required: false,
-      },
-    },
+  "take_memory_snapshot": {
+    "description": "Capture a heap snapshot of the currently selected page. Use to analyze the memory distribution of JavaScript objects and debug memory leaks.",
+    "category": "Performance",
+    "args": {
+      "filePath": {
+        "name": "filePath",
+        "type": "string",
+        "description": "A path to a .heapsnapshot file to save the heapsnapshot to.",
+        "required": true
+      }
+    }
   },
-  upload_file: {
-    description: 'Upload a file through a provided element.',
-    category: 'Input automation',
-    args: {
-      uid: {
-        name: 'uid',
-        type: 'string',
-        description:
-          'The uid of the file input element or an element that will open file chooser on the page from the page content snapshot',
-        required: true,
+  "take_screenshot": {
+    "description": "Take a screenshot of the page or element.",
+    "category": "Debugging",
+    "args": {
+      "format": {
+        "name": "format",
+        "type": "string",
+        "description": "Type of format to save the screenshot as. Default is \"png\"",
+        "required": false,
+        "default": "png",
+        "enum": [
+          "png",
+          "jpeg",
+          "webp"
+        ]
       },
-      filePath: {
-        name: 'filePath',
-        type: 'string',
-        description: 'The local path of the file to upload',
-        required: true,
+      "quality": {
+        "name": "quality",
+        "type": "number",
+        "description": "Compression quality for JPEG and WebP formats (0-100). Higher values mean better quality but larger file sizes. Ignored for PNG format.",
+        "required": false
       },
-      includeSnapshot: {
-        name: 'includeSnapshot',
-        type: 'boolean',
-        description:
-          'Whether to include a snapshot in the response. Default is false.',
-        required: false,
+      "uid": {
+        "name": "uid",
+        "type": "string",
+        "description": "The uid of an element on the page from the page content snapshot. If omitted, takes a page screenshot.",
+        "required": false
       },
-    },
+      "fullPage": {
+        "name": "fullPage",
+        "type": "boolean",
+        "description": "If set to true takes a screenshot of the full page instead of the currently visible viewport. Incompatible with uid.",
+        "required": false
+      },
+      "filePath": {
+        "name": "filePath",
+        "type": "string",
+        "description": "The absolute path, or a path relative to the current working directory, to save the screenshot to instead of attaching it to the response.",
+        "required": false
+      }
+    }
   },
+  "take_snapshot": {
+    "description": "Take a text snapshot of the currently selected page based on the a11y tree. The snapshot lists page elements along with a unique\nidentifier (uid). Always use the latest snapshot. Prefer taking a snapshot over taking a screenshot. The snapshot indicates the element selected\nin the DevTools Elements panel (if any).",
+    "category": "Debugging",
+    "args": {
+      "verbose": {
+        "name": "verbose",
+        "type": "boolean",
+        "description": "Whether to include all possible information available in the full a11y tree. Default is false.",
+        "required": false
+      },
+      "filePath": {
+        "name": "filePath",
+        "type": "string",
+        "description": "The absolute path, or a path relative to the current working directory, to save the snapshot to instead of attaching it to the response.",
+        "required": false
+      }
+    }
+  },
+  "type_text": {
+    "description": "Type text using keyboard into a previously focused input",
+    "category": "Input automation",
+    "args": {
+      "text": {
+        "name": "text",
+        "type": "string",
+        "description": "The text to type",
+        "required": true
+      },
+      "submitKey": {
+        "name": "submitKey",
+        "type": "string",
+        "description": "Optional key to press after typing. E.g., \"Enter\", \"Tab\", \"Escape\"",
+        "required": false
+      }
+    }
+  },
+  "upload_file": {
+    "description": "Upload a file through a provided element.",
+    "category": "Input automation",
+    "args": {
+      "uid": {
+        "name": "uid",
+        "type": "string",
+        "description": "The uid of the file input element or an element that will open file chooser on the page from the page content snapshot",
+        "required": true
+      },
+      "filePath": {
+        "name": "filePath",
+        "type": "string",
+        "description": "The local path of the file to upload",
+        "required": true
+      },
+      "includeSnapshot": {
+        "name": "includeSnapshot",
+        "type": "boolean",
+        "description": "Whether to include a snapshot in the response. Default is false.",
+        "required": false
+      }
+    }
+  }
 } as const;

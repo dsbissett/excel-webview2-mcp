@@ -1,17 +1,17 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-export type AddinProject = {
+export interface AddinProject {
   root: string;
   manifestPath: string;
   manifestKind: 'xml' | 'json';
   packageManager: 'npm' | 'pnpm' | 'yarn';
   existingCdpScript?: string;
-};
+}
 
-type PackageJson = {
+interface PackageJson {
   scripts?: Record<string, string>;
-};
+}
 
 export async function detectExcelAddin(
   cwd: string,

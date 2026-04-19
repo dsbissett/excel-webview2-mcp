@@ -5,11 +5,11 @@ import sinon from 'sinon';
 
 import type {AddinProject} from '../../src/launch/detectAddin.js';
 import {LaunchError} from '../../src/launch/launchExcel.js';
+import {runAutoLaunch} from '../../src/launch/runAutoLaunch.js';
 import {
   excelDetectAddin,
   excelLaunchAddin,
   excelStopAddin,
-  runAutoLaunch,
 } from '../../src/tools/lifecycle.js';
 import {
   resetLifecycleDepsForTesting,
