@@ -249,6 +249,7 @@ Evidence-backed findings from the current repo. Cite these rather than re-discov
 
 - Tool pattern: [src/tools/snapshot.ts:12-41](../../src/tools/snapshot.ts#L12-L41) (handler shape).
 - Registration: existing imports and `...Object.values(...)` spread in `createTools()`.
+
 ### Verification checklist
 
 - `npm run gen` regenerates `docs/tool-reference.md` with `connection_status`.

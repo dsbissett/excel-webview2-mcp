@@ -655,7 +655,9 @@ async function isPortListening(
     const socket = net.createConnection({host: '127.0.0.1', port});
     let settled = false;
     const finish = (listening: boolean) => {
-      if (settled) return;
+      if (settled) {
+        return;
+      }
       settled = true;
       socket.destroy();
       resolve(listening);

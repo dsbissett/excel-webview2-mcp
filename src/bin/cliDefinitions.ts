@@ -13,619 +13,1153 @@ export type Commands = Record<
   {
     description: string;
     category: string;
-    args: Record<string, ArgDef>
+    args: Record<string, ArgDef>;
   }
 >;
 export const commands: Commands = {
-  "click": {
-    "description": "Clicks on the provided element",
-    "category": "Input automation",
-    "args": {
-      "uid": {
-        "name": "uid",
-        "type": "string",
-        "description": "The uid of an element on the page from the page content snapshot",
-        "required": true
+  click: {
+    description: 'Clicks on the provided element',
+    category: 'Input automation',
+    args: {
+      uid: {
+        name: 'uid',
+        type: 'string',
+        description:
+          'The uid of an element on the page from the page content snapshot',
+        required: true,
       },
-      "dblClick": {
-        "name": "dblClick",
-        "type": "boolean",
-        "description": "Set to true for double clicks. Default is false.",
-        "required": false
+      dblClick: {
+        name: 'dblClick',
+        type: 'boolean',
+        description: 'Set to true for double clicks. Default is false.',
+        required: false,
       },
-      "includeSnapshot": {
-        "name": "includeSnapshot",
-        "type": "boolean",
-        "description": "Whether to include a snapshot in the response. Default is false.",
-        "required": false
-      }
-    }
+      includeSnapshot: {
+        name: 'includeSnapshot',
+        type: 'boolean',
+        description:
+          'Whether to include a snapshot in the response. Default is false.',
+        required: false,
+      },
+    },
   },
-  "close_page": {
-    "description": "Closes the page by its index. The last open page cannot be closed.",
-    "category": "Navigation automation",
-    "args": {
-      "pageId": {
-        "name": "pageId",
-        "type": "number",
-        "description": "The ID of the page to close. Call list_pages to list pages.",
-        "required": true
-      }
-    }
+  close_page: {
+    description:
+      'Closes the page by its index. The last open page cannot be closed.',
+    category: 'Navigation automation',
+    args: {
+      pageId: {
+        name: 'pageId',
+        type: 'number',
+        description:
+          'The ID of the page to close. Call list_pages to list pages.',
+        required: true,
+      },
+    },
   },
-  "connection_status": {
-    "description": "Reports whether the server is currently attached to a browser and which CDP endpoint it is tracking.",
-    "category": "Debugging",
-    "args": {
-      "probe": {
-        "name": "probe",
-        "type": "boolean",
-        "description": "If true, re-runs the CDP /json/version probe for the tracked endpoint instead of returning cached probe state.",
-        "required": false
-      }
-    }
+  connection_status: {
+    description:
+      'Reports whether the server is currently attached to a browser and which CDP endpoint it is tracking.',
+    category: 'Debugging',
+    args: {
+      probe: {
+        name: 'probe',
+        type: 'boolean',
+        description:
+          'If true, re-runs the CDP /json/version probe for the tracked endpoint instead of returning cached probe state.',
+        required: false,
+      },
+    },
   },
-  "drag": {
-    "description": "Drag an element onto another element",
-    "category": "Input automation",
-    "args": {
-      "from_uid": {
-        "name": "from_uid",
-        "type": "string",
-        "description": "The uid of the element to drag",
-        "required": true
+  drag: {
+    description: 'Drag an element onto another element',
+    category: 'Input automation',
+    args: {
+      from_uid: {
+        name: 'from_uid',
+        type: 'string',
+        description: 'The uid of the element to drag',
+        required: true,
       },
-      "to_uid": {
-        "name": "to_uid",
-        "type": "string",
-        "description": "The uid of the element to drop into",
-        "required": true
+      to_uid: {
+        name: 'to_uid',
+        type: 'string',
+        description: 'The uid of the element to drop into',
+        required: true,
       },
-      "includeSnapshot": {
-        "name": "includeSnapshot",
-        "type": "boolean",
-        "description": "Whether to include a snapshot in the response. Default is false.",
-        "required": false
-      }
-    }
+      includeSnapshot: {
+        name: 'includeSnapshot',
+        type: 'boolean',
+        description:
+          'Whether to include a snapshot in the response. Default is false.',
+        required: false,
+      },
+    },
   },
-  "emulate": {
-    "description": "Throttles network and/or CPU on the selected page.",
-    "category": "Emulation",
-    "args": {
-      "networkConditions": {
-        "name": "networkConditions",
-        "type": "string",
-        "description": "Throttle network. Omit to disable throttling.",
-        "required": false,
-        "enum": [
-          "Offline",
-          "Slow 3G",
-          "Fast 3G",
-          "Slow 4G",
-          "Fast 4G"
-        ]
+  emulate: {
+    description: 'Throttles network and/or CPU on the selected page.',
+    category: 'Emulation',
+    args: {
+      networkConditions: {
+        name: 'networkConditions',
+        type: 'string',
+        description: 'Throttle network. Omit to disable throttling.',
+        required: false,
+        enum: ['Offline', 'Slow 3G', 'Fast 3G', 'Slow 4G', 'Fast 4G'],
       },
-      "cpuThrottlingRate": {
-        "name": "cpuThrottlingRate",
-        "type": "number",
-        "description": "Represents the CPU slowdown factor. Omit or set the rate to 1 to disable throttling",
-        "required": false
-      }
-    }
+      cpuThrottlingRate: {
+        name: 'cpuThrottlingRate',
+        type: 'number',
+        description:
+          'Represents the CPU slowdown factor. Omit or set the rate to 1 to disable throttling',
+        required: false,
+      },
+    },
   },
-  "evaluate_script": {
-    "description": "Evaluate a JavaScript function inside the currently selected page. Returns the response as JSON,\nso returned values have to be JSON-serializable.",
-    "category": "Debugging",
-    "args": {
-      "function": {
-        "name": "function",
-        "type": "string",
-        "description": "A JavaScript function declaration to be executed by the tool in the currently selected page.\nExample without arguments: `() => {\n  return document.title\n}` or `async () => {\n  return await fetch(\"example.com\")\n}`.\nExample with arguments: `(el) => {\n  return el.innerText;\n}`\n",
-        "required": true
+  evaluate_script: {
+    description:
+      'Evaluate a JavaScript function inside the currently selected page. Returns the response as JSON,\nso returned values have to be JSON-serializable.',
+    category: 'Debugging',
+    args: {
+      function: {
+        name: 'function',
+        type: 'string',
+        description:
+          'A JavaScript function declaration to be executed by the tool in the currently selected page.\nExample without arguments: `() => {\n  return document.title\n}` or `async () => {\n  return await fetch("example.com")\n}`.\nExample with arguments: `(el) => {\n  return el.innerText;\n}`\n',
+        required: true,
       },
-      "args": {
-        "name": "args",
-        "type": "array",
-        "description": "An optional list of arguments to pass to the function.",
-        "required": false
-      }
-    }
+      args: {
+        name: 'args',
+        type: 'array',
+        description: 'An optional list of arguments to pass to the function.',
+        required: false,
+      },
+    },
   },
-  "excel_active_range": {
-    "description": "Returns the currently selected Excel range (address, dimensions, and values). Optionally includes formulas and number formats. Requires an Excel add-in target with Excel.run available.",
-    "category": "Excel",
-    "args": {
-      "includeFormulas": {
-        "name": "includeFormulas",
-        "type": "boolean",
-        "description": "If true, also return the A1-style formulas for each cell.",
-        "required": false
+  excel_active_range: {
+    description:
+      'Returns the currently selected Excel range (address, dimensions, and values). Optionally includes formulas and number formats. Requires an Excel add-in target with Excel.run available.',
+    category: 'Excel',
+    args: {
+      includeFormulas: {
+        name: 'includeFormulas',
+        type: 'boolean',
+        description:
+          'If true, also return the A1-style formulas for each cell.',
+        required: false,
       },
-      "includeNumberFormat": {
-        "name": "includeNumberFormat",
-        "type": "boolean",
-        "description": "If true, also return the Excel number-format code per cell.",
-        "required": false
-      }
-    }
+      includeNumberFormat: {
+        name: 'includeNumberFormat',
+        type: 'boolean',
+        description:
+          'If true, also return the Excel number-format code per cell.',
+        required: false,
+      },
+    },
   },
-  "excel_context_info": {
-    "description": "Returns Office.js and Excel host information for the selected page, including supported requirement sets when available.",
-    "category": "Excel",
-    "args": {}
+  excel_calculation_state: {
+    description:
+      'Returns the workbook calculation mode (automatic/manual/etc.) and current calculation state (done/calculating/pending).',
+    category: 'Excel',
+    args: {},
   },
-  "excel_detect_addin": {
-    "description": "Inspects a working directory and reports whether it looks like an Excel add-in project (manifest location, manifest kind, package manager, and any existing remote-debugging script).",
-    "category": "Add-in lifecycle",
-    "args": {
-      "cwd": {
-        "name": "cwd",
-        "type": "string",
-        "description": "Directory to inspect. Defaults to the MCP server working directory.",
-        "required": false
-      }
-    }
+  excel_chart_image: {
+    description:
+      'Returns a chart rendered as a PNG image, encoded as base64. Useful for visual verification.',
+    category: 'Excel',
+    args: {
+      sheet: {
+        name: 'sheet',
+        type: 'string',
+        description: 'Worksheet name containing the chart.',
+        required: true,
+      },
+      name: {
+        name: 'name',
+        type: 'string',
+        description: 'Chart name.',
+        required: true,
+      },
+      width: {
+        name: 'width',
+        type: 'number',
+        description:
+          'Image width in pixels. Defaults to the chart’s natural size.',
+        required: false,
+      },
+      height: {
+        name: 'height',
+        type: 'number',
+        description:
+          'Image height in pixels. Defaults to the chart’s natural size.',
+        required: false,
+      },
+    },
   },
-  "excel_launch_addin": {
-    "description": "Launches Excel with the detected add-in and WebView2 remote debugging enabled. Idempotent per manifest path: re-calling returns the tracked launch instead of spawning a duplicate.",
-    "category": "Add-in lifecycle",
-    "args": {
-      "cwd": {
-        "name": "cwd",
-        "type": "string",
-        "description": "",
-        "required": false
+  excel_chart_info: {
+    description:
+      'Returns detailed information about a chart: type, title, series names, axis titles, and source data address.',
+    category: 'Excel',
+    args: {
+      sheet: {
+        name: 'sheet',
+        type: 'string',
+        description: 'Worksheet name containing the chart.',
+        required: true,
       },
-      "port": {
-        "name": "port",
-        "type": "integer",
-        "description": "",
-        "required": false
+      name: {
+        name: 'name',
+        type: 'string',
+        description: 'Chart name.',
+        required: true,
       },
-      "manifestPath": {
-        "name": "manifestPath",
-        "type": "string",
-        "description": "",
-        "required": false
-      },
-      "extraBrowserArgs": {
-        "name": "extraBrowserArgs",
-        "type": "array",
-        "description": "",
-        "required": false
-      },
-      "timeoutMs": {
-        "name": "timeoutMs",
-        "type": "integer",
-        "description": "",
-        "required": false
-      },
-      "autoConnect": {
-        "name": "autoConnect",
-        "type": "boolean",
-        "description": "",
-        "required": false
-      }
-    }
+    },
   },
-  "excel_stop_addin": {
-    "description": "Stops the most recent Excel add-in launched by excel_launch_addin (or a specific manifest). Runs office-addin-debugging stop and kills the process if it does not exit cleanly.",
-    "category": "Add-in lifecycle",
-    "args": {
-      "manifestPath": {
-        "name": "manifestPath",
-        "type": "string",
-        "description": "",
-        "required": false
-      }
-    }
+  excel_context_info: {
+    description:
+      'Returns Office.js and Excel host information for the selected page, including supported requirement sets when available.',
+    category: 'Excel',
+    args: {},
   },
-  "fill": {
-    "description": "Type text into an input, text area or select an option from a <select> element.",
-    "category": "Input automation",
-    "args": {
-      "uid": {
-        "name": "uid",
-        "type": "string",
-        "description": "The uid of an element on the page from the page content snapshot",
-        "required": true
-      },
-      "value": {
-        "name": "value",
-        "type": "string",
-        "description": "The value to fill in",
-        "required": true
-      },
-      "includeSnapshot": {
-        "name": "includeSnapshot",
-        "type": "boolean",
-        "description": "Whether to include a snapshot in the response. Default is false.",
-        "required": false
-      }
-    }
+  excel_custom_xml_parts: {
+    description:
+      'Lists custom XML parts stored in the workbook: id and namespace URI.',
+    category: 'Excel',
+    args: {},
   },
-  "get_console_message": {
-    "description": "Gets a console message by its ID. You can get all messages by calling list_console_messages.",
-    "category": "Debugging",
-    "args": {
-      "msgid": {
-        "name": "msgid",
-        "type": "number",
-        "description": "The msgid of a console message on the page from the listed console messages",
-        "required": true
-      }
-    }
+  excel_detect_addin: {
+    description:
+      'Inspects a working directory and reports whether it looks like an Excel add-in project (manifest location, manifest kind, package manager, and any existing remote-debugging script).',
+    category: 'Add-in lifecycle',
+    args: {
+      cwd: {
+        name: 'cwd',
+        type: 'string',
+        description:
+          'Directory to inspect. Defaults to the MCP server working directory.',
+        required: false,
+      },
+    },
   },
-  "get_network_request": {
-    "description": "Gets a network request by an optional reqid, if omitted returns the currently selected request in the DevTools Network panel.",
-    "category": "Network",
-    "args": {
-      "reqid": {
-        "name": "reqid",
-        "type": "number",
-        "description": "The reqid of the network request. If omitted returns the currently selected request in the DevTools Network panel.",
-        "required": false
+  excel_find_in_range: {
+    description:
+      'Finds all matches of a text string within a range. Returns the combined match address and cell count.',
+    category: 'Excel',
+    args: {
+      address: {
+        name: 'address',
+        type: 'string',
+        description:
+          "A1 reference such as 'Sheet1!A1:C10' or 'A1:C10'. If omitted, the active selection is used.",
+        required: false,
       },
-      "requestFilePath": {
-        "name": "requestFilePath",
-        "type": "string",
-        "description": "The absolute or relative path to save the request body to. If omitted, the body is returned inline.",
-        "required": false
+      sheet: {
+        name: 'sheet',
+        type: 'string',
+        description:
+          'Worksheet name. Used when address omits the sheet prefix; ignored if address includes one.',
+        required: false,
       },
-      "responseFilePath": {
-        "name": "responseFilePath",
-        "type": "string",
-        "description": "The absolute or relative path to save the response body to. If omitted, the body is returned inline.",
-        "required": false
-      }
-    }
+      text: {
+        name: 'text',
+        type: 'string',
+        description: 'Text to search for.',
+        required: true,
+      },
+      completeMatch: {
+        name: 'completeMatch',
+        type: 'boolean',
+        description: 'If true, require a whole-cell match. Defaults to false.',
+        required: false,
+      },
+      matchCase: {
+        name: 'matchCase',
+        type: 'boolean',
+        description:
+          'If true, the search is case-sensitive. Defaults to false.',
+        required: false,
+      },
+    },
   },
-  "handle_dialog": {
-    "description": "If a browser dialog was opened, use this command to handle it",
-    "category": "Input automation",
-    "args": {
-      "action": {
-        "name": "action",
-        "type": "string",
-        "description": "Whether to dismiss or accept the dialog",
-        "required": true,
-        "enum": [
-          "accept",
-          "dismiss"
-        ]
+  excel_launch_addin: {
+    description:
+      'Launches Excel with the detected add-in and WebView2 remote debugging enabled. Idempotent per manifest path: re-calling returns the tracked launch instead of spawning a duplicate.',
+    category: 'Add-in lifecycle',
+    args: {
+      cwd: {
+        name: 'cwd',
+        type: 'string',
+        description: '',
+        required: false,
       },
-      "promptText": {
-        "name": "promptText",
-        "type": "string",
-        "description": "Optional prompt text to enter into the dialog.",
-        "required": false
-      }
-    }
+      port: {
+        name: 'port',
+        type: 'integer',
+        description: '',
+        required: false,
+      },
+      manifestPath: {
+        name: 'manifestPath',
+        type: 'string',
+        description: '',
+        required: false,
+      },
+      extraBrowserArgs: {
+        name: 'extraBrowserArgs',
+        type: 'array',
+        description: '',
+        required: false,
+      },
+      timeoutMs: {
+        name: 'timeoutMs',
+        type: 'integer',
+        description: '',
+        required: false,
+      },
+      autoConnect: {
+        name: 'autoConnect',
+        type: 'boolean',
+        description: '',
+        required: false,
+      },
+      skipDevServer: {
+        name: 'skipDevServer',
+        type: 'boolean',
+        description: '',
+        required: false,
+      },
+      devServerTimeoutMs: {
+        name: 'devServerTimeoutMs',
+        type: 'integer',
+        description: '',
+        required: false,
+      },
+    },
   },
-  "hover": {
-    "description": "Hover over the provided element",
-    "category": "Input automation",
-    "args": {
-      "uid": {
-        "name": "uid",
-        "type": "string",
-        "description": "The uid of an element on the page from the page content snapshot",
-        "required": true
+  excel_list_charts: {
+    description:
+      'Lists all charts across worksheets: name, id, worksheet, type, title, position, and size.',
+    category: 'Excel',
+    args: {
+      sheet: {
+        name: 'sheet',
+        type: 'string',
+        description: 'Worksheet name. Omit to list charts on all worksheets.',
+        required: false,
       },
-      "includeSnapshot": {
-        "name": "includeSnapshot",
-        "type": "boolean",
-        "description": "Whether to include a snapshot in the response. Default is false.",
-        "required": false
-      }
-    }
+    },
   },
-  "lighthouse_audit": {
-    "description": "Get Lighthouse score and reports for accessibility, SEO and best practices. This excludes performance. For performance audits, run performance_start_trace",
-    "category": "Debugging",
-    "args": {
-      "mode": {
-        "name": "mode",
-        "type": "string",
-        "description": "\"navigation\" reloads & audits. \"snapshot\" analyzes current state.",
-        "required": false,
-        "default": "navigation",
-        "enum": [
-          "navigation",
-          "snapshot"
-        ]
+  excel_list_comments: {
+    description:
+      'Lists comments and replies on a worksheet: author, content, timestamp, and cell address.',
+    category: 'Excel',
+    args: {
+      sheet: {
+        name: 'sheet',
+        type: 'string',
+        description: 'Worksheet name. Omit to use the active worksheet.',
+        required: false,
       },
-      "device": {
-        "name": "device",
-        "type": "string",
-        "description": "Device to emulate.",
-        "required": false,
-        "default": "desktop",
-        "enum": [
-          "desktop",
-          "mobile"
-        ]
-      },
-      "outputDirPath": {
-        "name": "outputDirPath",
-        "type": "string",
-        "description": "Directory for reports. If omitted, uses temporary files.",
-        "required": false
-      }
-    }
+    },
   },
-  "list_console_messages": {
-    "description": "List all console messages for the currently selected page since the last navigation.",
-    "category": "Debugging",
-    "args": {
-      "pageSize": {
-        "name": "pageSize",
-        "type": "integer",
-        "description": "Maximum number of messages to return. When omitted, returns all messages.",
-        "required": false
+  excel_list_conditional_formats: {
+    description:
+      'Lists conditional-format rules on a range: id, type, priority, stopIfTrue. Omit address to use the active worksheet’s used range.',
+    category: 'Excel',
+    args: {
+      address: {
+        name: 'address',
+        type: 'string',
+        description:
+          "A1 reference such as 'Sheet1!A1:C10' or 'A1:C10'. If omitted, the active selection is used.",
+        required: false,
       },
-      "pageIdx": {
-        "name": "pageIdx",
-        "type": "integer",
-        "description": "Page number to return (0-based). When omitted, returns the first page.",
-        "required": false
+      sheet: {
+        name: 'sheet',
+        type: 'string',
+        description:
+          'Worksheet name. Used when address omits the sheet prefix; ignored if address includes one.',
+        required: false,
       },
-      "types": {
-        "name": "types",
-        "type": "array",
-        "description": "Filter messages to only return messages of the specified resource types. When omitted or empty, returns all messages.",
-        "required": false
-      },
-      "includePreservedMessages": {
-        "name": "includePreservedMessages",
-        "type": "boolean",
-        "description": "Set to true to return the preserved messages over the last 3 navigations.",
-        "required": false,
-        "default": false
-      }
-    }
+    },
   },
-  "list_network_requests": {
-    "description": "List all requests for the currently selected page since the last navigation.",
-    "category": "Network",
-    "args": {
-      "pageSize": {
-        "name": "pageSize",
-        "type": "integer",
-        "description": "Maximum number of requests to return. When omitted, returns all requests.",
-        "required": false
+  excel_list_data_validations: {
+    description:
+      'Returns data-validation configuration on a range: type, rule, error alert, and prompt. Omit address to use the active selection.',
+    category: 'Excel',
+    args: {
+      address: {
+        name: 'address',
+        type: 'string',
+        description:
+          "A1 reference such as 'Sheet1!A1:C10' or 'A1:C10'. If omitted, the active selection is used.",
+        required: false,
       },
-      "pageIdx": {
-        "name": "pageIdx",
-        "type": "integer",
-        "description": "Page number to return (0-based). When omitted, returns the first page.",
-        "required": false
+      sheet: {
+        name: 'sheet',
+        type: 'string',
+        description:
+          'Worksheet name. Used when address omits the sheet prefix; ignored if address includes one.',
+        required: false,
       },
-      "resourceTypes": {
-        "name": "resourceTypes",
-        "type": "array",
-        "description": "Filter requests to only return requests of the specified resource types. When omitted or empty, returns all requests.",
-        "required": false
-      },
-      "includePreservedRequests": {
-        "name": "includePreservedRequests",
-        "type": "boolean",
-        "description": "Set to true to return the preserved requests over the last 3 navigations.",
-        "required": false,
-        "default": false
-      }
-    }
+    },
   },
-  "list_pages": {
-    "description": "Get a list of pages  open in the browser.",
-    "category": "Navigation automation",
-    "args": {}
+  excel_list_named_items: {
+    description:
+      'Lists workbook-scoped named items (named ranges and formulas) with name, type, value, formula, visibility, and comment.',
+    category: 'Excel',
+    args: {},
   },
-  "performance_analyze_insight": {
-    "description": "Provides more detailed information on a specific Performance Insight of an insight set that was highlighted in the results of a trace recording.",
-    "category": "Performance",
-    "args": {
-      "insightSetId": {
-        "name": "insightSetId",
-        "type": "string",
-        "description": "The id for the specific insight set. Only use the ids given in the \"Available insight sets\" list.",
-        "required": true
-      },
-      "insightName": {
-        "name": "insightName",
-        "type": "string",
-        "description": "The name of the Insight you want more information on. For example: \"DocumentLatency\" or \"LCPBreakdown\"",
-        "required": true
-      }
-    }
+  excel_list_pivot_tables: {
+    description:
+      'Lists all PivotTables in the workbook with name, worksheet, layout address, and enabled flags.',
+    category: 'Excel',
+    args: {},
   },
-  "performance_start_trace": {
-    "description": "Start a performance trace on the selected webpage. Use to find frontend performance issues, Core Web Vitals (LCP, INP, CLS), and improve page load speed.",
-    "category": "Performance",
-    "args": {
-      "reload": {
-        "name": "reload",
-        "type": "boolean",
-        "description": "Determines if, once tracing has started, the current selected page should be automatically reloaded.",
-        "required": false,
-        "default": true
+  excel_list_shapes: {
+    description:
+      'Lists shapes (including images) on a worksheet: name, id, type, position, size, visibility.',
+    category: 'Excel',
+    args: {
+      sheet: {
+        name: 'sheet',
+        type: 'string',
+        description: 'Worksheet name. Omit to use the active worksheet.',
+        required: false,
       },
-      "autoStop": {
-        "name": "autoStop",
-        "type": "boolean",
-        "description": "Determines if the trace recording should be automatically stopped.",
-        "required": false,
-        "default": true
-      },
-      "filePath": {
-        "name": "filePath",
-        "type": "string",
-        "description": "The absolute file path, or a file path relative to the current working directory, to save the raw trace data. For example, trace.json.gz (compressed) or trace.json (uncompressed).",
-        "required": false
-      }
-    }
+    },
   },
-  "performance_stop_trace": {
-    "description": "Stop the active performance trace recording on the selected webpage.",
-    "category": "Performance",
-    "args": {
-      "filePath": {
-        "name": "filePath",
-        "type": "string",
-        "description": "The absolute file path, or a file path relative to the current working directory, to save the raw trace data. For example, trace.json.gz (compressed) or trace.json (uncompressed).",
-        "required": false
-      }
-    }
+  excel_list_tables: {
+    description:
+      'Lists all tables (ListObjects) in the workbook with name, worksheet, address, header/total row flags, row count, and style.',
+    category: 'Excel',
+    args: {},
   },
-  "press_key": {
-    "description": "Press a key or key combination. Use this when other input methods like fill() cannot be used (e.g., keyboard shortcuts, navigation keys, or special key combinations).",
-    "category": "Input automation",
-    "args": {
-      "key": {
-        "name": "key",
-        "type": "string",
-        "description": "A key or a combination (e.g., \"Enter\", \"Control+A\", \"Control++\", \"Control+Shift+R\"). Modifiers: Control, Shift, Alt, Meta",
-        "required": true
-      },
-      "includeSnapshot": {
-        "name": "includeSnapshot",
-        "type": "boolean",
-        "description": "Whether to include a snapshot in the response. Default is false.",
-        "required": false
-      }
-    }
+  excel_list_worksheets: {
+    description:
+      'Lists all worksheets in the workbook with name, id, position, visibility, and tab color.',
+    category: 'Excel',
+    args: {},
   },
-  "select_page": {
-    "description": "Select a page as a context for future tool calls.",
-    "category": "Navigation automation",
-    "args": {
-      "pageId": {
-        "name": "pageId",
-        "type": "number",
-        "description": "The ID of the page to select. Call list_pages to get available pages.",
-        "required": true
+  excel_pivot_table_info: {
+    description:
+      'Returns the structure of a PivotTable: row, column, data, and filter hierarchies with their source field names.',
+    category: 'Excel',
+    args: {
+      name: {
+        name: 'name',
+        type: 'string',
+        description: 'PivotTable name.',
+        required: true,
       },
-      "bringToFront": {
-        "name": "bringToFront",
-        "type": "boolean",
-        "description": "Whether to focus the page and bring it to the top.",
-        "required": false
-      }
-    }
+    },
   },
-  "take_memory_snapshot": {
-    "description": "Capture a heap snapshot of the currently selected page. Use to analyze the memory distribution of JavaScript objects and debug memory leaks.",
-    "category": "Performance",
-    "args": {
-      "filePath": {
-        "name": "filePath",
-        "type": "string",
-        "description": "A path to a .heapsnapshot file to save the heapsnapshot to.",
-        "required": true
-      }
-    }
+  excel_pivot_table_values: {
+    description:
+      'Returns the rendered values of a PivotTable layout range with truncation when it exceeds the cell cap.',
+    category: 'Excel',
+    args: {
+      name: {
+        name: 'name',
+        type: 'string',
+        description: 'PivotTable name.',
+        required: true,
+      },
+    },
   },
-  "take_screenshot": {
-    "description": "Take a screenshot of the page or element.",
-    "category": "Debugging",
-    "args": {
-      "format": {
-        "name": "format",
-        "type": "string",
-        "description": "Type of format to save the screenshot as. Default is \"png\"",
-        "required": false,
-        "default": "png",
-        "enum": [
-          "png",
-          "jpeg",
-          "webp"
-        ]
+  excel_range_formulas: {
+    description:
+      'Returns formulas (A1 and R1C1) alongside resolved values for a range. Useful for verifying formula edits.',
+    category: 'Excel',
+    args: {
+      address: {
+        name: 'address',
+        type: 'string',
+        description:
+          "A1 reference such as 'Sheet1!A1:C10' or 'A1:C10'. If omitted, the active selection is used.",
+        required: false,
       },
-      "quality": {
-        "name": "quality",
-        "type": "number",
-        "description": "Compression quality for JPEG and WebP formats (0-100). Higher values mean better quality but larger file sizes. Ignored for PNG format.",
-        "required": false
+      sheet: {
+        name: 'sheet',
+        type: 'string',
+        description:
+          'Worksheet name. Used when address omits the sheet prefix; ignored if address includes one.',
+        required: false,
       },
-      "uid": {
-        "name": "uid",
-        "type": "string",
-        "description": "The uid of an element on the page from the page content snapshot. If omitted, takes a page screenshot.",
-        "required": false
-      },
-      "fullPage": {
-        "name": "fullPage",
-        "type": "boolean",
-        "description": "If set to true takes a screenshot of the full page instead of the currently visible viewport. Incompatible with uid.",
-        "required": false
-      },
-      "filePath": {
-        "name": "filePath",
-        "type": "string",
-        "description": "The absolute path, or a path relative to the current working directory, to save the screenshot to instead of attaching it to the response.",
-        "required": false
-      }
-    }
+    },
   },
-  "take_snapshot": {
-    "description": "Take a text snapshot of the currently selected page based on the a11y tree. The snapshot lists page elements along with a unique\nidentifier (uid). Always use the latest snapshot. Prefer taking a snapshot over taking a screenshot. The snapshot indicates the element selected\nin the DevTools Elements panel (if any).",
-    "category": "Debugging",
-    "args": {
-      "verbose": {
-        "name": "verbose",
-        "type": "boolean",
-        "description": "Whether to include all possible information available in the full a11y tree. Default is false.",
-        "required": false
+  excel_range_properties: {
+    description:
+      'Returns rich properties for a range: value types, hasSpill, row/column hidden flags, and selected format details (font, fill, alignment, borders). Use include flags to bound payload.',
+    category: 'Excel',
+    args: {
+      address: {
+        name: 'address',
+        type: 'string',
+        description:
+          "A1 reference such as 'Sheet1!A1:C10' or 'A1:C10'. If omitted, the active selection is used.",
+        required: false,
       },
-      "filePath": {
-        "name": "filePath",
-        "type": "string",
-        "description": "The absolute path, or a path relative to the current working directory, to save the snapshot to instead of attaching it to the response.",
-        "required": false
-      }
-    }
+      sheet: {
+        name: 'sheet',
+        type: 'string',
+        description:
+          'Worksheet name. Used when address omits the sheet prefix; ignored if address includes one.',
+        required: false,
+      },
+      includeFormat: {
+        name: 'includeFormat',
+        type: 'boolean',
+        description:
+          'If true, include font, fill, alignment, and border summary per cell.',
+        required: false,
+      },
+      includeStyle: {
+        name: 'includeStyle',
+        type: 'boolean',
+        description: 'If true, include the named style of each cell.',
+        required: false,
+      },
+    },
   },
-  "type_text": {
-    "description": "Type text using keyboard into a previously focused input",
-    "category": "Input automation",
-    "args": {
-      "text": {
-        "name": "text",
-        "type": "string",
-        "description": "The text to type",
-        "required": true
+  excel_range_special_cells: {
+    description:
+      "Finds cells within a range matching a category: 'constants', 'formulas', 'blanks', or 'visible'. Optionally filter by value type. Returns the resulting address and cell count.",
+    category: 'Excel',
+    args: {
+      address: {
+        name: 'address',
+        type: 'string',
+        description:
+          "A1 reference such as 'Sheet1!A1:C10' or 'A1:C10'. If omitted, the active selection is used.",
+        required: false,
       },
-      "submitKey": {
-        "name": "submitKey",
-        "type": "string",
-        "description": "Optional key to press after typing. E.g., \"Enter\", \"Tab\", \"Escape\"",
-        "required": false
-      }
-    }
+      sheet: {
+        name: 'sheet',
+        type: 'string',
+        description:
+          'Worksheet name. Used when address omits the sheet prefix; ignored if address includes one.',
+        required: false,
+      },
+      cellType: {
+        name: 'cellType',
+        type: 'string',
+        description: 'Category of special cells to locate.',
+        required: true,
+        enum: ['constants', 'formulas', 'blanks', 'visible'],
+      },
+      valueType: {
+        name: 'valueType',
+        type: 'string',
+        description:
+          "For 'constants' or 'formulas', filter by value type. Defaults to 'all'.",
+        required: false,
+        enum: ['all', 'errors', 'logical', 'numbers', 'text'],
+      },
+    },
   },
-  "upload_file": {
-    "description": "Upload a file through a provided element.",
-    "category": "Input automation",
-    "args": {
-      "uid": {
-        "name": "uid",
-        "type": "string",
-        "description": "The uid of the file input element or an element that will open file chooser on the page from the page content snapshot",
-        "required": true
+  excel_read_range: {
+    description:
+      "Reads a range by address (e.g. 'Sheet1!A1:C10' or 'A1:C10' with a sheet param). Omit address to read the active selection. Returns values and optionally formulas / number formats.",
+    category: 'Excel',
+    args: {
+      address: {
+        name: 'address',
+        type: 'string',
+        description:
+          "A1 reference such as 'Sheet1!A1:C10' or 'A1:C10'. If omitted, the active selection is used.",
+        required: false,
       },
-      "filePath": {
-        "name": "filePath",
-        "type": "string",
-        "description": "The local path of the file to upload",
-        "required": true
+      sheet: {
+        name: 'sheet',
+        type: 'string',
+        description:
+          'Worksheet name. Used when address omits the sheet prefix; ignored if address includes one.',
+        required: false,
       },
-      "includeSnapshot": {
-        "name": "includeSnapshot",
-        "type": "boolean",
-        "description": "Whether to include a snapshot in the response. Default is false.",
-        "required": false
-      }
-    }
-  }
+      includeFormulas: {
+        name: 'includeFormulas',
+        type: 'boolean',
+        description:
+          'If true, also return the A1-style formulas for each cell.',
+        required: false,
+      },
+      includeNumberFormat: {
+        name: 'includeNumberFormat',
+        type: 'boolean',
+        description:
+          'If true, also return the Excel number-format code per cell.',
+        required: false,
+      },
+    },
+  },
+  excel_settings_get: {
+    description:
+      'Reads add-in document settings from Office.context.document.settings. Returns all keys or a single key’s value.',
+    category: 'Excel',
+    args: {
+      key: {
+        name: 'key',
+        type: 'string',
+        description:
+          'If provided, return only this setting’s value. Otherwise, return all settings.',
+        required: false,
+      },
+    },
+  },
+  excel_stop_addin: {
+    description:
+      'Stops the most recent Excel add-in launched by excel_launch_addin (or a specific manifest). Runs office-addin-debugging stop and kills the process if it does not exit cleanly.',
+    category: 'Add-in lifecycle',
+    args: {
+      manifestPath: {
+        name: 'manifestPath',
+        type: 'string',
+        description: '',
+        required: false,
+      },
+    },
+  },
+  excel_table_filters: {
+    description:
+      'Returns the active filter criteria per column for a table. Columns without an active filter have null criteria.',
+    category: 'Excel',
+    args: {
+      name: {
+        name: 'name',
+        type: 'string',
+        description: 'Table name (ListObject name).',
+        required: true,
+      },
+    },
+  },
+  excel_table_info: {
+    description:
+      'Returns detail for a single table: name, worksheet, address, row count, columns (name + filter criteria), header/total row flags, and style.',
+    category: 'Excel',
+    args: {
+      name: {
+        name: 'name',
+        type: 'string',
+        description: 'Table name (ListObject name).',
+        required: true,
+      },
+    },
+  },
+  excel_table_rows: {
+    description:
+      'Returns the data-body values of a table with truncation when row*column count exceeds the cell cap.',
+    category: 'Excel',
+    args: {
+      name: {
+        name: 'name',
+        type: 'string',
+        description: 'Table name (ListObject name).',
+        required: true,
+      },
+      includeHeaders: {
+        name: 'includeHeaders',
+        type: 'boolean',
+        description: 'If true, include the header row names.',
+        required: false,
+      },
+    },
+  },
+  excel_used_range: {
+    description:
+      'Returns values (and optionally formulas / number formats) for a worksheet’s used range, with truncation when the range exceeds the cell cap.',
+    category: 'Excel',
+    args: {
+      sheet: {
+        name: 'sheet',
+        type: 'string',
+        description: 'Worksheet name. Omit to use the active worksheet.',
+        required: false,
+      },
+      valuesOnly: {
+        name: 'valuesOnly',
+        type: 'boolean',
+        description:
+          'If true (default), only cells with values count toward the used range.',
+        required: false,
+      },
+      includeFormulas: {
+        name: 'includeFormulas',
+        type: 'boolean',
+        description:
+          'If true, also return the A1-style formulas for each cell.',
+        required: false,
+      },
+      includeNumberFormat: {
+        name: 'includeNumberFormat',
+        type: 'boolean',
+        description:
+          'If true, also return the Excel number-format code per cell.',
+        required: false,
+      },
+    },
+  },
+  excel_workbook_info: {
+    description:
+      'Returns workbook-level metadata: name, save state, calculation mode and state, and protection state.',
+    category: 'Excel',
+    args: {},
+  },
+  excel_worksheet_info: {
+    description:
+      'Returns metadata for a single worksheet: used range address, visibility, protection, gridlines, tab color, and dimensions.',
+    category: 'Excel',
+    args: {
+      sheet: {
+        name: 'sheet',
+        type: 'string',
+        description: 'Worksheet name. Omit to use the active worksheet.',
+        required: false,
+      },
+    },
+  },
+  fill: {
+    description:
+      'Type text into an input, text area or select an option from a <select> element.',
+    category: 'Input automation',
+    args: {
+      uid: {
+        name: 'uid',
+        type: 'string',
+        description:
+          'The uid of an element on the page from the page content snapshot',
+        required: true,
+      },
+      value: {
+        name: 'value',
+        type: 'string',
+        description: 'The value to fill in',
+        required: true,
+      },
+      includeSnapshot: {
+        name: 'includeSnapshot',
+        type: 'boolean',
+        description:
+          'Whether to include a snapshot in the response. Default is false.',
+        required: false,
+      },
+    },
+  },
+  get_console_message: {
+    description:
+      'Gets a console message by its ID. You can get all messages by calling list_console_messages.',
+    category: 'Debugging',
+    args: {
+      msgid: {
+        name: 'msgid',
+        type: 'number',
+        description:
+          'The msgid of a console message on the page from the listed console messages',
+        required: true,
+      },
+    },
+  },
+  get_network_request: {
+    description:
+      'Gets a network request by an optional reqid, if omitted returns the currently selected request in the DevTools Network panel.',
+    category: 'Network',
+    args: {
+      reqid: {
+        name: 'reqid',
+        type: 'number',
+        description:
+          'The reqid of the network request. If omitted returns the currently selected request in the DevTools Network panel.',
+        required: false,
+      },
+      requestFilePath: {
+        name: 'requestFilePath',
+        type: 'string',
+        description:
+          'The absolute or relative path to save the request body to. If omitted, the body is returned inline.',
+        required: false,
+      },
+      responseFilePath: {
+        name: 'responseFilePath',
+        type: 'string',
+        description:
+          'The absolute or relative path to save the response body to. If omitted, the body is returned inline.',
+        required: false,
+      },
+    },
+  },
+  handle_dialog: {
+    description:
+      'If a browser dialog was opened, use this command to handle it',
+    category: 'Input automation',
+    args: {
+      action: {
+        name: 'action',
+        type: 'string',
+        description: 'Whether to dismiss or accept the dialog',
+        required: true,
+        enum: ['accept', 'dismiss'],
+      },
+      promptText: {
+        name: 'promptText',
+        type: 'string',
+        description: 'Optional prompt text to enter into the dialog.',
+        required: false,
+      },
+    },
+  },
+  hover: {
+    description: 'Hover over the provided element',
+    category: 'Input automation',
+    args: {
+      uid: {
+        name: 'uid',
+        type: 'string',
+        description:
+          'The uid of an element on the page from the page content snapshot',
+        required: true,
+      },
+      includeSnapshot: {
+        name: 'includeSnapshot',
+        type: 'boolean',
+        description:
+          'Whether to include a snapshot in the response. Default is false.',
+        required: false,
+      },
+    },
+  },
+  lighthouse_audit: {
+    description:
+      'Get Lighthouse score and reports for accessibility, SEO and best practices. This excludes performance. For performance audits, run performance_start_trace',
+    category: 'Debugging',
+    args: {
+      mode: {
+        name: 'mode',
+        type: 'string',
+        description:
+          '"navigation" reloads & audits. "snapshot" analyzes current state.',
+        required: false,
+        default: 'navigation',
+        enum: ['navigation', 'snapshot'],
+      },
+      device: {
+        name: 'device',
+        type: 'string',
+        description: 'Device to emulate.',
+        required: false,
+        default: 'desktop',
+        enum: ['desktop', 'mobile'],
+      },
+      outputDirPath: {
+        name: 'outputDirPath',
+        type: 'string',
+        description: 'Directory for reports. If omitted, uses temporary files.',
+        required: false,
+      },
+    },
+  },
+  list_console_messages: {
+    description:
+      'List all console messages for the currently selected page since the last navigation.',
+    category: 'Debugging',
+    args: {
+      pageSize: {
+        name: 'pageSize',
+        type: 'integer',
+        description:
+          'Maximum number of messages to return. When omitted, returns all messages.',
+        required: false,
+      },
+      pageIdx: {
+        name: 'pageIdx',
+        type: 'integer',
+        description:
+          'Page number to return (0-based). When omitted, returns the first page.',
+        required: false,
+      },
+      types: {
+        name: 'types',
+        type: 'array',
+        description:
+          'Filter messages to only return messages of the specified resource types. When omitted or empty, returns all messages.',
+        required: false,
+      },
+      includePreservedMessages: {
+        name: 'includePreservedMessages',
+        type: 'boolean',
+        description:
+          'Set to true to return the preserved messages over the last 3 navigations.',
+        required: false,
+        default: false,
+      },
+    },
+  },
+  list_network_requests: {
+    description:
+      'List all requests for the currently selected page since the last navigation.',
+    category: 'Network',
+    args: {
+      pageSize: {
+        name: 'pageSize',
+        type: 'integer',
+        description:
+          'Maximum number of requests to return. When omitted, returns all requests.',
+        required: false,
+      },
+      pageIdx: {
+        name: 'pageIdx',
+        type: 'integer',
+        description:
+          'Page number to return (0-based). When omitted, returns the first page.',
+        required: false,
+      },
+      resourceTypes: {
+        name: 'resourceTypes',
+        type: 'array',
+        description:
+          'Filter requests to only return requests of the specified resource types. When omitted or empty, returns all requests.',
+        required: false,
+      },
+      includePreservedRequests: {
+        name: 'includePreservedRequests',
+        type: 'boolean',
+        description:
+          'Set to true to return the preserved requests over the last 3 navigations.',
+        required: false,
+        default: false,
+      },
+    },
+  },
+  list_pages: {
+    description: 'Get a list of pages  open in the browser.',
+    category: 'Navigation automation',
+    args: {},
+  },
+  performance_analyze_insight: {
+    description:
+      'Provides more detailed information on a specific Performance Insight of an insight set that was highlighted in the results of a trace recording.',
+    category: 'Performance',
+    args: {
+      insightSetId: {
+        name: 'insightSetId',
+        type: 'string',
+        description:
+          'The id for the specific insight set. Only use the ids given in the "Available insight sets" list.',
+        required: true,
+      },
+      insightName: {
+        name: 'insightName',
+        type: 'string',
+        description:
+          'The name of the Insight you want more information on. For example: "DocumentLatency" or "LCPBreakdown"',
+        required: true,
+      },
+    },
+  },
+  performance_start_trace: {
+    description:
+      'Start a performance trace on the selected webpage. Use to find frontend performance issues, Core Web Vitals (LCP, INP, CLS), and improve page load speed.',
+    category: 'Performance',
+    args: {
+      reload: {
+        name: 'reload',
+        type: 'boolean',
+        description:
+          'Determines if, once tracing has started, the current selected page should be automatically reloaded.',
+        required: false,
+        default: true,
+      },
+      autoStop: {
+        name: 'autoStop',
+        type: 'boolean',
+        description:
+          'Determines if the trace recording should be automatically stopped.',
+        required: false,
+        default: true,
+      },
+      filePath: {
+        name: 'filePath',
+        type: 'string',
+        description:
+          'The absolute file path, or a file path relative to the current working directory, to save the raw trace data. For example, trace.json.gz (compressed) or trace.json (uncompressed).',
+        required: false,
+      },
+    },
+  },
+  performance_stop_trace: {
+    description:
+      'Stop the active performance trace recording on the selected webpage.',
+    category: 'Performance',
+    args: {
+      filePath: {
+        name: 'filePath',
+        type: 'string',
+        description:
+          'The absolute file path, or a file path relative to the current working directory, to save the raw trace data. For example, trace.json.gz (compressed) or trace.json (uncompressed).',
+        required: false,
+      },
+    },
+  },
+  press_key: {
+    description:
+      'Press a key or key combination. Use this when other input methods like fill() cannot be used (e.g., keyboard shortcuts, navigation keys, or special key combinations).',
+    category: 'Input automation',
+    args: {
+      key: {
+        name: 'key',
+        type: 'string',
+        description:
+          'A key or a combination (e.g., "Enter", "Control+A", "Control++", "Control+Shift+R"). Modifiers: Control, Shift, Alt, Meta',
+        required: true,
+      },
+      includeSnapshot: {
+        name: 'includeSnapshot',
+        type: 'boolean',
+        description:
+          'Whether to include a snapshot in the response. Default is false.',
+        required: false,
+      },
+    },
+  },
+  select_page: {
+    description: 'Select a page as a context for future tool calls.',
+    category: 'Navigation automation',
+    args: {
+      pageId: {
+        name: 'pageId',
+        type: 'number',
+        description:
+          'The ID of the page to select. Call list_pages to get available pages.',
+        required: true,
+      },
+      bringToFront: {
+        name: 'bringToFront',
+        type: 'boolean',
+        description: 'Whether to focus the page and bring it to the top.',
+        required: false,
+      },
+    },
+  },
+  take_memory_snapshot: {
+    description:
+      'Capture a heap snapshot of the currently selected page. Use to analyze the memory distribution of JavaScript objects and debug memory leaks.',
+    category: 'Performance',
+    args: {
+      filePath: {
+        name: 'filePath',
+        type: 'string',
+        description:
+          'A path to a .heapsnapshot file to save the heapsnapshot to.',
+        required: true,
+      },
+    },
+  },
+  take_screenshot: {
+    description: 'Take a screenshot of the page or element.',
+    category: 'Debugging',
+    args: {
+      format: {
+        name: 'format',
+        type: 'string',
+        description:
+          'Type of format to save the screenshot as. Default is "png"',
+        required: false,
+        default: 'png',
+        enum: ['png', 'jpeg', 'webp'],
+      },
+      quality: {
+        name: 'quality',
+        type: 'number',
+        description:
+          'Compression quality for JPEG and WebP formats (0-100). Higher values mean better quality but larger file sizes. Ignored for PNG format.',
+        required: false,
+      },
+      uid: {
+        name: 'uid',
+        type: 'string',
+        description:
+          'The uid of an element on the page from the page content snapshot. If omitted, takes a page screenshot.',
+        required: false,
+      },
+      fullPage: {
+        name: 'fullPage',
+        type: 'boolean',
+        description:
+          'If set to true takes a screenshot of the full page instead of the currently visible viewport. Incompatible with uid.',
+        required: false,
+      },
+      filePath: {
+        name: 'filePath',
+        type: 'string',
+        description:
+          'The absolute path, or a path relative to the current working directory, to save the screenshot to instead of attaching it to the response.',
+        required: false,
+      },
+    },
+  },
+  take_snapshot: {
+    description:
+      'Take a text snapshot of the currently selected page based on the a11y tree. The snapshot lists page elements along with a unique\nidentifier (uid). Always use the latest snapshot. Prefer taking a snapshot over taking a screenshot. The snapshot indicates the element selected\nin the DevTools Elements panel (if any).',
+    category: 'Debugging',
+    args: {
+      verbose: {
+        name: 'verbose',
+        type: 'boolean',
+        description:
+          'Whether to include all possible information available in the full a11y tree. Default is false.',
+        required: false,
+      },
+      filePath: {
+        name: 'filePath',
+        type: 'string',
+        description:
+          'The absolute path, or a path relative to the current working directory, to save the snapshot to instead of attaching it to the response.',
+        required: false,
+      },
+    },
+  },
+  type_text: {
+    description: 'Type text using keyboard into a previously focused input',
+    category: 'Input automation',
+    args: {
+      text: {
+        name: 'text',
+        type: 'string',
+        description: 'The text to type',
+        required: true,
+      },
+      submitKey: {
+        name: 'submitKey',
+        type: 'string',
+        description:
+          'Optional key to press after typing. E.g., "Enter", "Tab", "Escape"',
+        required: false,
+      },
+    },
+  },
+  upload_file: {
+    description: 'Upload a file through a provided element.',
+    category: 'Input automation',
+    args: {
+      uid: {
+        name: 'uid',
+        type: 'string',
+        description:
+          'The uid of the file input element or an element that will open file chooser on the page from the page content snapshot',
+        required: true,
+      },
+      filePath: {
+        name: 'filePath',
+        type: 'string',
+        description: 'The local path of the file to upload',
+        required: true,
+      },
+      includeSnapshot: {
+        name: 'includeSnapshot',
+        type: 'boolean',
+        description:
+          'Whether to include a snapshot in the response. Default is false.',
+        required: false,
+      },
+    },
+  },
 } as const;

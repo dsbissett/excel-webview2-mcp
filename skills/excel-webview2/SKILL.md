@@ -65,6 +65,19 @@ The `--auto-launch` CLI flag runs `excel_launch_addin` once during MCP server st
 
 **For Office.js-aware debugging** (inspecting the selected range, reading `Office.context`, handling dialogs, probing requirement sets), see the [`excel-addin-debugging`](../excel-addin-debugging/SKILL.md) skill.
 
+### Verifying workbook state after add-in code changes
+
+The `excel_*` read tools run inside the add-in page via `Excel.run` and return structured JSON. They are all read-only (no mutation) and cap grid payloads at 1000 cells (`truncated: true` when exceeded). Use them to confirm that a code change produced the expected workbook state rather than only relying on UI screenshots.
+
+- **Workbook surface**: `excel_context_info`, `excel_workbook_info`, `excel_list_worksheets`, `excel_worksheet_info`, `excel_calculation_state`, `excel_list_named_items`, `excel_custom_xml_parts`, `excel_settings_get`.
+- **Ranges**: `excel_active_range` (current selection), `excel_read_range` (by A1 address or `Sheet!A1:C10`), `excel_used_range`, `excel_range_formulas` (A1 + R1C1 side-by-side with values), `excel_range_properties` (valueTypes, hidden flags, optional font/fill/alignment), `excel_range_special_cells` (constants/formulas/blanks/visible), `excel_find_in_range`.
+- **Tables**: `excel_list_tables`, `excel_table_info`, `excel_table_rows`, `excel_table_filters`.
+- **PivotTables**: `excel_list_pivot_tables`, `excel_pivot_table_info`, `excel_pivot_table_values`.
+- **Charts & shapes**: `excel_list_charts`, `excel_chart_info`, `excel_chart_image` (base64 PNG), `excel_list_shapes`.
+- **Validation & formatting rules**: `excel_list_conditional_formats`, `excel_list_data_validations`, `excel_list_comments`.
+
+Range-targeting tools accept either `{sheet, address}` or a fully qualified `'Sheet1!A1:C10'` address; omit the address to operate on the active selection. When a tool returns `{error: "Excel API not available on this target"}`, the selected page is not an Excel add-in context — re-run `list_pages` / `select_page`.
+
 ### Efficient data retrieval
 
 - Use `filePath` parameter for large outputs (screenshots, snapshots, traces)

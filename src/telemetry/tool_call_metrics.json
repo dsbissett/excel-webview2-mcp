@@ -613,6 +613,14 @@
       {
         "name": "auto_connect",
         "argType": "boolean"
+      },
+      {
+        "name": "skip_dev_server",
+        "argType": "boolean"
+      },
+      {
+        "name": "dev_server_timeout_ms",
+        "argType": "number"
       }
     ]
   },
@@ -621,6 +629,310 @@
     "args": [
       {
         "name": "manifest_path_length",
+        "argType": "number"
+      }
+    ]
+  },
+  {
+    "name": "excel_calculation_state",
+    "args": []
+  },
+  {
+    "name": "excel_chart_image",
+    "args": [
+      {
+        "name": "sheet_length",
+        "argType": "number"
+      },
+      {
+        "name": "name_length",
+        "argType": "number"
+      },
+      {
+        "name": "width",
+        "argType": "number"
+      },
+      {
+        "name": "height",
+        "argType": "number"
+      }
+    ]
+  },
+  {
+    "name": "excel_chart_info",
+    "args": [
+      {
+        "name": "sheet_length",
+        "argType": "number"
+      },
+      {
+        "name": "name_length",
+        "argType": "number"
+      }
+    ]
+  },
+  {
+    "name": "excel_custom_xml_parts",
+    "args": []
+  },
+  {
+    "name": "excel_find_in_range",
+    "args": [
+      {
+        "name": "address_length",
+        "argType": "number"
+      },
+      {
+        "name": "sheet_length",
+        "argType": "number"
+      },
+      {
+        "name": "text_length",
+        "argType": "number"
+      },
+      {
+        "name": "complete_match",
+        "argType": "boolean"
+      },
+      {
+        "name": "match_case",
+        "argType": "boolean"
+      }
+    ]
+  },
+  {
+    "name": "excel_list_charts",
+    "args": [
+      {
+        "name": "sheet_length",
+        "argType": "number"
+      }
+    ]
+  },
+  {
+    "name": "excel_list_comments",
+    "args": [
+      {
+        "name": "sheet_length",
+        "argType": "number"
+      }
+    ]
+  },
+  {
+    "name": "excel_list_conditional_formats",
+    "args": [
+      {
+        "name": "address_length",
+        "argType": "number"
+      },
+      {
+        "name": "sheet_length",
+        "argType": "number"
+      }
+    ]
+  },
+  {
+    "name": "excel_list_data_validations",
+    "args": [
+      {
+        "name": "address_length",
+        "argType": "number"
+      },
+      {
+        "name": "sheet_length",
+        "argType": "number"
+      }
+    ]
+  },
+  {
+    "name": "excel_list_named_items",
+    "args": []
+  },
+  {
+    "name": "excel_list_pivot_tables",
+    "args": []
+  },
+  {
+    "name": "excel_list_shapes",
+    "args": [
+      {
+        "name": "sheet_length",
+        "argType": "number"
+      }
+    ]
+  },
+  {
+    "name": "excel_list_tables",
+    "args": []
+  },
+  {
+    "name": "excel_list_worksheets",
+    "args": []
+  },
+  {
+    "name": "excel_pivot_table_info",
+    "args": [
+      {
+        "name": "name_length",
+        "argType": "number"
+      }
+    ]
+  },
+  {
+    "name": "excel_pivot_table_values",
+    "args": [
+      {
+        "name": "name_length",
+        "argType": "number"
+      }
+    ]
+  },
+  {
+    "name": "excel_range_formulas",
+    "args": [
+      {
+        "name": "address_length",
+        "argType": "number"
+      },
+      {
+        "name": "sheet_length",
+        "argType": "number"
+      }
+    ]
+  },
+  {
+    "name": "excel_range_properties",
+    "args": [
+      {
+        "name": "address_length",
+        "argType": "number"
+      },
+      {
+        "name": "sheet_length",
+        "argType": "number"
+      },
+      {
+        "name": "include_format",
+        "argType": "boolean"
+      },
+      {
+        "name": "include_style",
+        "argType": "boolean"
+      }
+    ]
+  },
+  {
+    "name": "excel_range_special_cells",
+    "args": [
+      {
+        "name": "address_length",
+        "argType": "number"
+      },
+      {
+        "name": "sheet_length",
+        "argType": "number"
+      },
+      {
+        "name": "cell_type",
+        "argType": "string"
+      },
+      {
+        "name": "value_type",
+        "argType": "string"
+      }
+    ]
+  },
+  {
+    "name": "excel_read_range",
+    "args": [
+      {
+        "name": "address_length",
+        "argType": "number"
+      },
+      {
+        "name": "sheet_length",
+        "argType": "number"
+      },
+      {
+        "name": "include_formulas",
+        "argType": "boolean"
+      },
+      {
+        "name": "include_number_format",
+        "argType": "boolean"
+      }
+    ]
+  },
+  {
+    "name": "excel_settings_get",
+    "args": [
+      {
+        "name": "key_length",
+        "argType": "number"
+      }
+    ]
+  },
+  {
+    "name": "excel_table_filters",
+    "args": [
+      {
+        "name": "name_length",
+        "argType": "number"
+      }
+    ]
+  },
+  {
+    "name": "excel_table_info",
+    "args": [
+      {
+        "name": "name_length",
+        "argType": "number"
+      }
+    ]
+  },
+  {
+    "name": "excel_table_rows",
+    "args": [
+      {
+        "name": "name_length",
+        "argType": "number"
+      },
+      {
+        "name": "include_headers",
+        "argType": "boolean"
+      }
+    ]
+  },
+  {
+    "name": "excel_used_range",
+    "args": [
+      {
+        "name": "sheet_length",
+        "argType": "number"
+      },
+      {
+        "name": "values_only",
+        "argType": "boolean"
+      },
+      {
+        "name": "include_formulas",
+        "argType": "boolean"
+      },
+      {
+        "name": "include_number_format",
+        "argType": "boolean"
+      }
+    ]
+  },
+  {
+    "name": "excel_workbook_info",
+    "args": []
+  },
+  {
+    "name": "excel_worksheet_info",
+    "args": [
+      {
+        "name": "sheet_length",
         "argType": "number"
       }
     ]

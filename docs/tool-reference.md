@@ -1,6 +1,6 @@
 <!-- AUTO GENERATED DO NOT EDIT - run 'npm run gen' to update-->
 
-# Excel WebView2 MCP Tool Reference (~6915 cl100k_base tokens)
+# Excel WebView2 MCP Tool Reference (~11784 cl100k_base tokens)
 
 - **[Input automation](#input-automation)** (9 tools)
   - [`click`](#click)
@@ -17,9 +17,36 @@
   - [`list_pages`](#list_pages)
   - [`select_page`](#select_page)
   - [`wait_for`](#wait_for)
-- **[Excel](#excel)** (2 tools)
+- **[Excel](#excel)** (29 tools)
   - [`excel_active_range`](#excel_active_range)
+  - [`excel_calculation_state`](#excel_calculation_state)
+  - [`excel_chart_image`](#excel_chart_image)
+  - [`excel_chart_info`](#excel_chart_info)
   - [`excel_context_info`](#excel_context_info)
+  - [`excel_custom_xml_parts`](#excel_custom_xml_parts)
+  - [`excel_find_in_range`](#excel_find_in_range)
+  - [`excel_list_charts`](#excel_list_charts)
+  - [`excel_list_comments`](#excel_list_comments)
+  - [`excel_list_conditional_formats`](#excel_list_conditional_formats)
+  - [`excel_list_data_validations`](#excel_list_data_validations)
+  - [`excel_list_named_items`](#excel_list_named_items)
+  - [`excel_list_pivot_tables`](#excel_list_pivot_tables)
+  - [`excel_list_shapes`](#excel_list_shapes)
+  - [`excel_list_tables`](#excel_list_tables)
+  - [`excel_list_worksheets`](#excel_list_worksheets)
+  - [`excel_pivot_table_info`](#excel_pivot_table_info)
+  - [`excel_pivot_table_values`](#excel_pivot_table_values)
+  - [`excel_range_formulas`](#excel_range_formulas)
+  - [`excel_range_properties`](#excel_range_properties)
+  - [`excel_range_special_cells`](#excel_range_special_cells)
+  - [`excel_read_range`](#excel_read_range)
+  - [`excel_settings_get`](#excel_settings_get)
+  - [`excel_table_filters`](#excel_table_filters)
+  - [`excel_table_info`](#excel_table_info)
+  - [`excel_table_rows`](#excel_table_rows)
+  - [`excel_used_range`](#excel_used_range)
+  - [`excel_workbook_info`](#excel_workbook_info)
+  - [`excel_worksheet_info`](#excel_worksheet_info)
 - **[Emulation](#emulation)** (1 tools)
   - [`emulate`](#emulate)
 - **[Performance](#performance)** (4 tools)
@@ -162,7 +189,7 @@
 
 ### `list_pages`
 
-**Description:** Get a list of pages  open in the browser.
+**Description:** Get a list of pages open in the browser.
 
 **Parameters:** None
 
@@ -203,11 +230,291 @@
 
 ---
 
+### `excel_calculation_state`
+
+**Description:** Returns the workbook calculation mode (automatic/manual/etc.) and current calculation state (done/calculating/pending).
+
+**Parameters:** None
+
+---
+
+### `excel_chart_image`
+
+**Description:** Returns a chart rendered as a PNG image, encoded as base64. Useful for visual verification.
+
+**Parameters:**
+
+- **name** (string) **(required)**: Chart name.
+- **sheet** (string) **(required)**: Worksheet name containing the chart.
+- **height** (number) _(optional)_: Image height in pixels. Defaults to the chart’s natural size.
+- **width** (number) _(optional)_: Image width in pixels. Defaults to the chart’s natural size.
+
+---
+
+### `excel_chart_info`
+
+**Description:** Returns detailed information about a chart: type, title, series names, axis titles, and source data address.
+
+**Parameters:**
+
+- **name** (string) **(required)**: Chart name.
+- **sheet** (string) **(required)**: Worksheet name containing the chart.
+
+---
+
 ### `excel_context_info`
 
 **Description:** Returns Office.js and Excel host information for the selected page, including supported requirement sets when available.
 
 **Parameters:** None
+
+---
+
+### `excel_custom_xml_parts`
+
+**Description:** Lists custom XML parts stored in the workbook: id and namespace URI.
+
+**Parameters:** None
+
+---
+
+### `excel_find_in_range`
+
+**Description:** Finds all matches of a text string within a range. Returns the combined match address and cell count.
+
+**Parameters:**
+
+- **text** (string) **(required)**: Text to search for.
+- **address** (string) _(optional)_: A1 reference such as 'Sheet1!A1:C10' or 'A1:C10'. If omitted, the active selection is used.
+- **completeMatch** (boolean) _(optional)_: If true, require a whole-cell match. Defaults to false.
+- **matchCase** (boolean) _(optional)_: If true, the search is case-sensitive. Defaults to false.
+- **sheet** (string) _(optional)_: Worksheet name. Used when address omits the sheet prefix; ignored if address includes one.
+
+---
+
+### `excel_list_charts`
+
+**Description:** Lists all charts across worksheets: name, id, worksheet, type, title, position, and size.
+
+**Parameters:**
+
+- **sheet** (string) _(optional)_: Worksheet name. Omit to list charts on all worksheets.
+
+---
+
+### `excel_list_comments`
+
+**Description:** Lists comments and replies on a worksheet: author, content, timestamp, and cell address.
+
+**Parameters:**
+
+- **sheet** (string) _(optional)_: Worksheet name. Omit to use the active worksheet.
+
+---
+
+### `excel_list_conditional_formats`
+
+**Description:** Lists conditional-format rules on a range: id, type, priority, stopIfTrue. Omit address to use the active worksheet’s used range.
+
+**Parameters:**
+
+- **address** (string) _(optional)_: A1 reference such as 'Sheet1!A1:C10' or 'A1:C10'. If omitted, the active selection is used.
+- **sheet** (string) _(optional)_: Worksheet name. Used when address omits the sheet prefix; ignored if address includes one.
+
+---
+
+### `excel_list_data_validations`
+
+**Description:** Returns data-validation configuration on a range: type, rule, error alert, and prompt. Omit address to use the active selection.
+
+**Parameters:**
+
+- **address** (string) _(optional)_: A1 reference such as 'Sheet1!A1:C10' or 'A1:C10'. If omitted, the active selection is used.
+- **sheet** (string) _(optional)_: Worksheet name. Used when address omits the sheet prefix; ignored if address includes one.
+
+---
+
+### `excel_list_named_items`
+
+**Description:** Lists workbook-scoped named items (named ranges and formulas) with name, type, value, formula, visibility, and comment.
+
+**Parameters:** None
+
+---
+
+### `excel_list_pivot_tables`
+
+**Description:** Lists all PivotTables in the workbook with name, worksheet, layout address, and enabled flags.
+
+**Parameters:** None
+
+---
+
+### `excel_list_shapes`
+
+**Description:** Lists shapes (including images) on a worksheet: name, id, type, position, size, visibility.
+
+**Parameters:**
+
+- **sheet** (string) _(optional)_: Worksheet name. Omit to use the active worksheet.
+
+---
+
+### `excel_list_tables`
+
+**Description:** Lists all tables (ListObjects) in the workbook with name, worksheet, address, header/total row flags, row count, and style.
+
+**Parameters:** None
+
+---
+
+### `excel_list_worksheets`
+
+**Description:** Lists all worksheets in the workbook with name, id, position, visibility, and tab color.
+
+**Parameters:** None
+
+---
+
+### `excel_pivot_table_info`
+
+**Description:** Returns the structure of a PivotTable: row, column, data, and filter hierarchies with their source field names.
+
+**Parameters:**
+
+- **name** (string) **(required)**: PivotTable name.
+
+---
+
+### `excel_pivot_table_values`
+
+**Description:** Returns the rendered values of a PivotTable layout range with truncation when it exceeds the cell cap.
+
+**Parameters:**
+
+- **name** (string) **(required)**: PivotTable name.
+
+---
+
+### `excel_range_formulas`
+
+**Description:** Returns formulas (A1 and R1C1) alongside resolved values for a range. Useful for verifying formula edits.
+
+**Parameters:**
+
+- **address** (string) _(optional)_: A1 reference such as 'Sheet1!A1:C10' or 'A1:C10'. If omitted, the active selection is used.
+- **sheet** (string) _(optional)_: Worksheet name. Used when address omits the sheet prefix; ignored if address includes one.
+
+---
+
+### `excel_range_properties`
+
+**Description:** Returns rich properties for a range: value types, hasSpill, row/column hidden flags, and selected format details (font, [`fill`](#fill), alignment, borders). Use include flags to bound payload.
+
+**Parameters:**
+
+- **address** (string) _(optional)_: A1 reference such as 'Sheet1!A1:C10' or 'A1:C10'. If omitted, the active selection is used.
+- **includeFormat** (boolean) _(optional)_: If true, include font, [`fill`](#fill), alignment, and border summary per cell.
+- **includeStyle** (boolean) _(optional)_: If true, include the named style of each cell.
+- **sheet** (string) _(optional)_: Worksheet name. Used when address omits the sheet prefix; ignored if address includes one.
+
+---
+
+### `excel_range_special_cells`
+
+**Description:** Finds cells within a range matching a category: 'constants', 'formulas', 'blanks', or 'visible'. Optionally filter by value type. Returns the resulting address and cell count.
+
+**Parameters:**
+
+- **cellType** (enum: "constants", "formulas", "blanks", "visible") **(required)**: Category of special cells to locate.
+- **address** (string) _(optional)_: A1 reference such as 'Sheet1!A1:C10' or 'A1:C10'. If omitted, the active selection is used.
+- **sheet** (string) _(optional)_: Worksheet name. Used when address omits the sheet prefix; ignored if address includes one.
+- **valueType** (enum: "all", "errors", "logical", "numbers", "text") _(optional)_: For 'constants' or 'formulas', filter by value type. Defaults to 'all'.
+
+---
+
+### `excel_read_range`
+
+**Description:** Reads a range by address (e.g. 'Sheet1!A1:C10' or 'A1:C10' with a sheet param). Omit address to read the active selection. Returns values and optionally formulas / number formats.
+
+**Parameters:**
+
+- **address** (string) _(optional)_: A1 reference such as 'Sheet1!A1:C10' or 'A1:C10'. If omitted, the active selection is used.
+- **includeFormulas** (boolean) _(optional)_: If true, also return the A1-style formulas for each cell.
+- **includeNumberFormat** (boolean) _(optional)_: If true, also return the Excel number-format code per cell.
+- **sheet** (string) _(optional)_: Worksheet name. Used when address omits the sheet prefix; ignored if address includes one.
+
+---
+
+### `excel_settings_get`
+
+**Description:** Reads add-in document settings from Office.context.document.settings. Returns all keys or a single key’s value.
+
+**Parameters:**
+
+- **key** (string) _(optional)_: If provided, return only this setting’s value. Otherwise, return all settings.
+
+---
+
+### `excel_table_filters`
+
+**Description:** Returns the active filter criteria per column for a table. Columns without an active filter have null criteria.
+
+**Parameters:**
+
+- **name** (string) **(required)**: Table name (ListObject name).
+
+---
+
+### `excel_table_info`
+
+**Description:** Returns detail for a single table: name, worksheet, address, row count, columns (name + filter criteria), header/total row flags, and style.
+
+**Parameters:**
+
+- **name** (string) **(required)**: Table name (ListObject name).
+
+---
+
+### `excel_table_rows`
+
+**Description:** Returns the data-body values of a table with truncation when row\*column count exceeds the cell cap.
+
+**Parameters:**
+
+- **name** (string) **(required)**: Table name (ListObject name).
+- **includeHeaders** (boolean) _(optional)_: If true, include the header row names.
+
+---
+
+### `excel_used_range`
+
+**Description:** Returns values (and optionally formulas / number formats) for a worksheet’s used range, with truncation when the range exceeds the cell cap.
+
+**Parameters:**
+
+- **includeFormulas** (boolean) _(optional)_: If true, also return the A1-style formulas for each cell.
+- **includeNumberFormat** (boolean) _(optional)_: If true, also return the Excel number-format code per cell.
+- **sheet** (string) _(optional)_: Worksheet name. Omit to use the active worksheet.
+- **valuesOnly** (boolean) _(optional)_: If true (default), only cells with values count toward the used range.
+
+---
+
+### `excel_workbook_info`
+
+**Description:** Returns workbook-level metadata: name, save state, calculation mode and state, and protection state.
+
+**Parameters:** None
+
+---
+
+### `excel_worksheet_info`
+
+**Description:** Returns metadata for a single worksheet: used range address, visibility, protection, gridlines, tab color, and dimensions.
+
+**Parameters:**
+
+- **sheet** (string) _(optional)_: Worksheet name. Omit to use the active worksheet.
 
 ---
 
@@ -316,12 +623,12 @@ so returned values have to be JSON-serializable.
 **Parameters:**
 
 - **function** (string) **(required)**: A JavaScript function declaration to be executed by the tool in the currently selected page.
-Example without arguments: `() => {
+  Example without arguments: `() => {
   return document.title
 }` or `async () => {
   return await fetch("example.com")
 }`.
-Example with arguments: `(el) => {
+  Example with arguments: `(el) => {
   return el.innerText;
 }`
 
@@ -411,9 +718,11 @@ in the DevTools Elements panel (if any).
 
 - **autoConnect** (boolean) _(optional)_
 - **cwd** (string) _(optional)_
+- **devServerTimeoutMs** (integer) _(optional)_
 - **extraBrowserArgs** (array) _(optional)_
 - **manifestPath** (string) _(optional)_
 - **port** (integer) _(optional)_
+- **skipDevServer** (boolean) _(optional)_
 - **timeoutMs** (integer) _(optional)_
 
 ---
