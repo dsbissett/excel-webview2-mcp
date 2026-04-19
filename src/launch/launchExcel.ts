@@ -165,18 +165,29 @@ function createLaunchExcelImpl(
       env: deps.processRef.env,
       port,
       extraBrowserArgs: options.extraBrowserArgs,
+      projectRoot: options.project.root,
     });
 
-    const launchChild = deps.spawn(
-      launcher.command,
-      [...launcher.argsPrefix, 'start', options.project.manifestPath],
-      {
-        cwd: options.project.root,
-        env,
-        stdio: 'pipe',
-        windowsHide: false,
-      },
-    ) as LaunchChildProcess;
+    let launchChild: LaunchChildProcess;
+    try {
+      launchChild = spawnLauncher(
+        deps,
+        launcher,
+        ['start', options.project.manifestPath],
+        {
+          cwd: options.project.root,
+          env,
+          stdio: 'pipe',
+          windowsHide: false,
+        },
+      );
+    } catch (error) {
+      throw new LaunchError(
+        'launch-failed',
+        `Failed to spawn ${LAUNCHER_NAME} (${launcher.command}): ${(error as Error).message}`,
+        {cause: error},
+      );
+    }
 
     const pid = launchChild.pid;
     if (!pid || pid <= 0) {
@@ -346,6 +357,7 @@ function buildLaunchEnv(options: {
   env: NodeJS.ProcessEnv;
   port: number;
   extraBrowserArgs?: string[];
+  projectRoot: string;
 }): NodeJS.ProcessEnv {
   const existingArgs = options.env['WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS'];
   if (
@@ -363,10 +375,54 @@ function buildLaunchEnv(options: {
     ...(options.extraBrowserArgs ?? []).filter(Boolean),
   ].join(' ');
 
+  const binDir = path.join(options.projectRoot, 'node_modules', '.bin');
+  const pathKey = 'PATH' in options.env ? 'PATH' : 'Path';
+  const existingPath = options.env[pathKey] ?? '';
+  const augmentedPath = existingPath
+    ? `${binDir}${path.delimiter}${existingPath}`
+    : binDir;
+
   return {
     ...options.env,
+    [pathKey]: augmentedPath,
     WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: browserArgs.trim(),
   };
+}
+
+function spawnLauncher(
+  deps: LaunchExcelDeps,
+  launcher: LauncherCommand,
+  trailingArgs: string[],
+  options: {
+    cwd: string;
+    env: NodeJS.ProcessEnv;
+    stdio: 'pipe';
+    windowsHide: boolean;
+  },
+): LaunchChildProcess {
+  const args = [...launcher.argsPrefix, ...trailingArgs];
+  const isWindowsBatch =
+    deps.processRef.platform === 'win32' &&
+    /\.(cmd|bat)$/i.test(launcher.command);
+
+  if (isWindowsBatch) {
+    return deps.spawn(`"${launcher.command}"`, args.map(quoteWindowsShellArg), {
+      ...options,
+      shell: true,
+    }) as LaunchChildProcess;
+  }
+
+  return deps.spawn(launcher.command, args, options) as LaunchChildProcess;
+}
+
+function quoteWindowsShellArg(arg: string): string {
+  if (arg === '') {
+    return '""';
+  }
+  if (!/[\s"&|<>^%]/.test(arg)) {
+    return arg;
+  }
+  return `"${arg.replace(/"/g, '\\"')}"`;
 }
 
 function createOutputBuffer(child: LaunchChildProcess): string[] {
@@ -533,16 +589,21 @@ async function runLauncherCommand(
   output: string[],
   timeoutMs?: number,
 ): Promise<void> {
-  const child = deps.spawn(
-    launcher.command,
-    [...launcher.argsPrefix, action, project.manifestPath],
-    {
+  let child: LaunchChildProcess;
+  try {
+    child = spawnLauncher(deps, launcher, [action, project.manifestPath], {
       cwd: project.root,
       env: deps.processRef.env,
       stdio: 'pipe',
       windowsHide: false,
-    },
-  ) as LaunchChildProcess;
+    });
+  } catch (error) {
+    throw new LaunchError(
+      'stop-failed',
+      `Failed to spawn ${LAUNCHER_NAME} ${action} (${launcher.command}): ${(error as Error).message}`,
+      {cause: error, output},
+    );
+  }
 
   const commandOutput = createOutputBuffer(child);
   const completion = monitorChild(child);
