@@ -60,8 +60,8 @@ function formatReason(
 function shouldAppendHint(options: ConnectionErrorOptions): boolean {
   return Boolean(
     options.hint &&
-      options.reason !== 'unstable' &&
-      options.hint !== getDefaultConnectionHint(options.url),
+    options.reason !== 'unstable' &&
+    options.hint !== getDefaultConnectionHint(options.url),
   );
 }
 

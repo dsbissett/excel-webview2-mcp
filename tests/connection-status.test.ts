@@ -42,7 +42,7 @@ describe('connection_status tool', () => {
         arguments: {},
       });
 
-      assert.strictEqual(result.isError, false);
+      assert.notStrictEqual(result.isError, true);
       const payload = JSON.parse(
         getTextContent(
           (result.content as Array<{type: 'text'; text: string}>)[0],

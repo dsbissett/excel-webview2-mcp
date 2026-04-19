@@ -50,7 +50,7 @@ describe('connection error response', () => {
       assert.strictEqual(result.isError, true);
       assert.match(
         text,
-        /^Excel WebView2 debug endpoint is not reachable\.\n  Endpoint: http:\/\/127\.0\.0\.1:9\n  Reason:\s+unreachable\n  Verify:\s+curl http:\/\/127\.0\.0\.1:9\/json\/version\n  Docs:\s+https:\/\/github\.com\/dsbissett\/excel-webview2-mcp#launching-excel-with-debug-port$/,
+        /^Excel WebView2 debug endpoint is not reachable\.\n {2}Endpoint: http:\/\/127\.0\.0\.1:9\n {2}Reason:\s+unreachable\n {2}Verify:\s+curl http:\/\/127\.0\.0\.1:9\/json\/version\n {2}Docs:\s+https:\/\/github\.com\/dsbissett\/excel-webview2-mcp#launching-excel-with-debug-port$/,
       );
       assert.ok(!text.includes('\nCause:'), text);
     } finally {

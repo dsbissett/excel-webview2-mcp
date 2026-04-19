@@ -24,7 +24,11 @@ export function resetUpdateCheckFlagForTesting() {
 }
 
 export async function checkForUpdates(message: string) {
-  if (isChecking || process.env['EXCEL_WEBVIEW2_MCP_NO_UPDATE_CHECKS']) {
+  if (
+    isChecking ||
+    process.env['EXCEL_WEBVIEW2_MCP_NO_UPDATE_CHECKS'] ||
+    process.env['CHROME_DEVTOOLS_MCP_NO_UPDATE_CHECKS']
+  ) {
     return;
   }
   isChecking = true;

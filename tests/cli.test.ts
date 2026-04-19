@@ -8,6 +8,7 @@ import assert from 'node:assert';
 import {describe, it} from 'node:test';
 
 import {parseArguments} from '../src/bin/excel-webview2-mcp-cli-options.js';
+import {WEBVIEW2_DEBUG_URL} from '../src/browser.js';
 
 describe('cli args parsing', () => {
   const defaultArgs = {
@@ -25,6 +26,12 @@ describe('cli args parsing', () => {
     usageStatistics: true,
     'redact-network-headers': false,
     redactNetworkHeaders: false,
+    'connect-timeout': 5000,
+    connectTimeout: 5000,
+    'connect-retry-budget': 15000,
+    connectRetryBudget: 15000,
+    'connect-retry-verbose': false,
+    connectRetryVerbose: false,
   };
 
   it('parses with default args', async () => {
@@ -34,7 +41,7 @@ describe('cli args parsing', () => {
       _: [],
       headless: false,
       $0: 'npx @dsbissett/excel-webview2-mcp@latest',
-      channel: 'stable',
+      browserUrl: WEBVIEW2_DEBUG_URL,
     });
   });
 
@@ -68,7 +75,6 @@ describe('cli args parsing', () => {
       _: [],
       headless: false,
       $0: 'npx @dsbissett/excel-webview2-mcp@latest',
-      channel: 'stable',
       'user-data-dir': '/tmp/chrome-profile',
       userDataDir: '/tmp/chrome-profile',
     });
@@ -89,7 +95,6 @@ describe('cli args parsing', () => {
       'browser-url': undefined,
       browserUrl: undefined,
       u: undefined,
-      channel: 'stable',
     });
   });
 
@@ -123,7 +128,7 @@ describe('cli args parsing', () => {
       _: [],
       headless: false,
       $0: 'npx @dsbissett/excel-webview2-mcp@latest',
-      channel: 'stable',
+      browserUrl: WEBVIEW2_DEBUG_URL,
       viewport: {
         width: 888,
         height: 777,
@@ -143,7 +148,7 @@ describe('cli args parsing', () => {
       _: [],
       headless: false,
       $0: 'npx @dsbissett/excel-webview2-mcp@latest',
-      channel: 'stable',
+      browserUrl: WEBVIEW2_DEBUG_URL,
       'chrome-arg': ['--no-sandbox', '--disable-setuid-sandbox'],
       chromeArg: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
@@ -161,7 +166,7 @@ describe('cli args parsing', () => {
       _: [],
       headless: false,
       $0: 'npx @dsbissett/excel-webview2-mcp@latest',
-      channel: 'stable',
+      browserUrl: WEBVIEW2_DEBUG_URL,
       'ignore-default-chrome-arg': [
         '--disable-extensions',
         '--disable-cancel-all-touches',
@@ -235,7 +240,7 @@ describe('cli args parsing', () => {
       _: [],
       headless: false,
       $0: 'npx @dsbissett/excel-webview2-mcp@latest',
-      channel: 'stable',
+      browserUrl: WEBVIEW2_DEBUG_URL,
       'category-emulation': false,
       categoryEmulation: false,
     });
@@ -247,7 +252,6 @@ describe('cli args parsing', () => {
       _: [],
       headless: false,
       $0: 'npx @dsbissett/excel-webview2-mcp@latest',
-      channel: 'stable',
       'auto-connect': true,
       autoConnect: true,
     });

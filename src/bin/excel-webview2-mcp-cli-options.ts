@@ -343,9 +343,11 @@ export function parseArguments(version: string, argv = process.argv) {
       // Default to connecting to WebView2 on localhost:9222.
       // Pass --channel or --executable-path to launch Chrome instead.
       if (
+        !browserUrlExplicit &&
+        !wsEndpointExplicit &&
+        !autoConnectExplicit &&
+        !args.userDataDir &&
         !args.channel &&
-        !args.browserUrl &&
-        !args.wsEndpoint &&
         !args.executablePath
       ) {
         args.browserUrl = WEBVIEW2_DEBUG_URL;

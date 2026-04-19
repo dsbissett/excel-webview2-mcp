@@ -7,6 +7,8 @@
 import assert from 'node:assert';
 import {describe, it, afterEach, beforeEach} from 'node:test';
 
+import {executablePath} from 'puppeteer';
+
 import {
   assertDaemonIsNotRunning,
   assertDaemonIsRunning,
@@ -27,7 +29,11 @@ describe('excel-webview2', () => {
   it('can invoke list_pages', async () => {
     await assertDaemonIsNotRunning();
 
-    const startResult = await runCli(['start']);
+    const startResult = await runCli([
+      'start',
+      '--executable-path',
+      executablePath(),
+    ]);
     assert.strictEqual(
       startResult.status,
       0,
@@ -49,7 +55,11 @@ describe('excel-webview2', () => {
   });
 
   it('can take screenshot', async () => {
-    const startResult = await runCli(['start']);
+    const startResult = await runCli([
+      'start',
+      '--executable-path',
+      executablePath(),
+    ]);
     assert.strictEqual(
       startResult.status,
       0,

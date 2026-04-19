@@ -14,8 +14,7 @@ describe('ConnectionError', () => {
     const err = new ConnectionError({
       url: 'http://127.0.0.1:9222',
       reason: 'unreachable',
-      hint:
-        "Run: curl http://127.0.0.1:9222/json/version — if this fails, your Excel add-in isn't exposing the debug port.",
+      hint: "Run: curl http://127.0.0.1:9222/json/version — if this fails, your Excel add-in isn't exposing the debug port.",
     });
 
     assert.strictEqual(
@@ -33,8 +32,7 @@ describe('ConnectionError', () => {
     const err = new ConnectionError({
       url: 'ws://127.0.0.1:9222/devtools/browser/test-browser-id',
       reason: 'connect-failed',
-      hint:
-        "Run: curl http://127.0.0.1:9222/json/version — if this fails, your Excel add-in isn't exposing the debug port.",
+      hint: "Run: curl http://127.0.0.1:9222/json/version — if this fails, your Excel add-in isn't exposing the debug port.",
     });
 
     assert.match(

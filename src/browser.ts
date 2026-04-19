@@ -9,8 +9,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import {connectWithRetry} from './connection/retry.js';
 import {ConnectionError, getDefaultConnectionHint} from './connection/error.js';
+import {connectWithRetry} from './connection/retry.js';
 import {
   beginReconnect,
   getStickyError,
