@@ -1,6 +1,6 @@
 <!-- AUTO GENERATED DO NOT EDIT - run 'npm run gen' to update-->
 
-# Excel WebView2 MCP Tool Reference (~5903 cl100k_base tokens)
+# Excel WebView2 MCP Tool Reference (~6007 cl100k_base tokens)
 
 - **[Input automation](#input-automation)** (9 tools)
   - [`click`](#click)
@@ -17,6 +17,8 @@
   - [`list_pages`](#list_pages)
   - [`select_page`](#select_page)
   - [`wait_for`](#wait_for)
+- **[Excel](#excel)** (1 tools)
+  - [`excel_context_info`](#excel_context_info)
 - **[Emulation](#emulation)** (1 tools)
   - [`emulate`](#emulate)
 - **[Performance](#performance)** (4 tools)
@@ -179,6 +181,16 @@
 
 - **text** (array) **(required)**: Non-empty list of texts. Resolves when any value appears on the page.
 - **timeout** (integer) _(optional)_: Maximum wait time in milliseconds. If set to 0, the default timeout will be used.
+
+---
+
+## Excel
+
+### `excel_context_info`
+
+**Description:** Returns Office.js and Excel host information for the selected page, including supported requirement sets when available.
+
+**Parameters:** None
 
 ---
 

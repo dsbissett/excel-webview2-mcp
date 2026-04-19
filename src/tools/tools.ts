@@ -8,6 +8,7 @@ import type {ParsedArguments} from '../bin/excel-webview2-mcp-cli-options.js';
 
 import * as consoleTools from './console.js';
 import * as emulationTools from './emulation.js';
+import * as excelTools from './excel.js';
 import * as inPageTools from './inPage.js';
 import * as inputTools from './input.js';
 import * as lighthouseTools from './lighthouse.js';
@@ -28,6 +29,7 @@ export const createTools = (args: ParsedArguments) => {
     : [
         ...Object.values(consoleTools),
         ...Object.values(emulationTools),
+        ...Object.values(excelTools),
         ...Object.values(inPageTools),
         ...Object.values(inputTools),
         ...Object.values(lighthouseTools),

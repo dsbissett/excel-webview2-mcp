@@ -551,5 +551,9 @@
         "argType": "number"
       }
     ]
+  },
+  {
+    "name": "excel_context_info",
+    "args": []
   }
 ]

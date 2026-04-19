@@ -128,6 +128,12 @@ export const commands: Commands = {
       },
     },
   },
+  excel_context_info: {
+    description:
+      'Returns Office.js and Excel host information for the selected page, including supported requirement sets when available.',
+    category: 'Excel',
+    args: {},
+  },
   fill: {
     description:
       'Type text into an input, text area or select an option from a <select> element.',
