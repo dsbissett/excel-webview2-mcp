@@ -37,6 +37,8 @@ If tools fail to connect, verify the debuggable target is available: `curl http:
 
 **Note**: The MCP server exposes no navigation or tab-creation tools — the add-in host owns its URL and window. Attach to an already-running add-in and interact with the pages it exposes.
 
+**For Office.js-aware debugging** (inspecting the selected range, reading `Office.context`, handling dialogs, probing requirement sets), see the [`excel-addin-debugging`](../excel-addin-debugging/SKILL.md) skill.
+
 ### Efficient data retrieval
 
 - Use `filePath` parameter for large outputs (screenshots, snapshots, traces)
