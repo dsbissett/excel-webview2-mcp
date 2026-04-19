@@ -93,6 +93,7 @@ export async function createMcpServer(
             userDataDir: serverArgs.userDataDir,
             devtools,
             webview2: isWebView2Mode,
+            connectTimeout: serverArgs.connectTimeout,
           })
         : await ensureBrowserLaunched({
             headless: serverArgs.headless,

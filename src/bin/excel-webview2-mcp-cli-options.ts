@@ -66,6 +66,12 @@ export const cliOptions = {
       }
     },
   },
+  connectTimeout: {
+    type: 'number',
+    description:
+      'Timeout in milliseconds for the pre-connect health probe against /json/version. Default 5000.',
+    default: 5000,
+  },
   wsHeaders: {
     type: 'string',
     description:
