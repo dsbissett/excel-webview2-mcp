@@ -106,6 +106,24 @@ export const cliOptions = {
       'If true, log each connection retry attempt to stderr so users can see progress.',
     default: false,
   },
+  launchPort: {
+    type: 'number',
+    description:
+      'Default CDP port for excel_launch_addin when no port is supplied in the tool call.',
+    default: 9222,
+  },
+  launchTimeout: {
+    type: 'number',
+    description:
+      'Default timeout (ms) for excel_launch_addin to wait for the WebView2 CDP endpoint to become ready.',
+    default: 60000,
+  },
+  autoLaunch: {
+    type: 'boolean',
+    description:
+      'If set and the MCP server working directory looks like an Excel add-in, launch Excel once at server startup via excel_launch_addin.',
+    default: false,
+  },
   wsHeaders: {
     type: 'string',
     description:

@@ -7,6 +7,7 @@ export enum ToolCategory {
   NETWORK = 'network',
   DEBUGGING = 'debugging',
   IN_PAGE = 'in-page',
+  LIFECYCLE = 'lifecycle',
 }
 
 export const labels = {
@@ -18,4 +19,5 @@ export const labels = {
   [ToolCategory.NETWORK]: 'Network',
   [ToolCategory.DEBUGGING]: 'Debugging',
   [ToolCategory.IN_PAGE]: 'In-page tools',
+  [ToolCategory.LIFECYCLE]: 'Add-in lifecycle',
 };

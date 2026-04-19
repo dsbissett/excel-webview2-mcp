@@ -6,6 +6,7 @@ import {createMcpServer, logDisclaimers} from '../index.js';
 import {logger, saveLogsToFile} from '../logger.js';
 import {computeFlagUsage} from '../telemetry/flagUtils.js';
 import {StdioServerTransport} from '../third_party/index.js';
+import {runAutoLaunch} from '../tools/lifecycle.js';
 import {checkForUpdates} from '../utils/check-for-updates.js';
 import {VERSION} from '../version.js';
 
@@ -35,6 +36,13 @@ if (process.env['EXCEL_WEBVIEW2_MCP_CRASH_ON_UNCAUGHT'] !== 'true') {
 }
 
 logger(`Starting Excel WebView2 MCP Server v${VERSION}`);
+if (args.autoLaunch) {
+  await runAutoLaunch({
+    launchPort: args.launchPort,
+    launchTimeout: args.launchTimeout,
+    logger: msg => logger(msg),
+  });
+}
 const {server, clearcutLogger} = await createMcpServer(args, {
   logFile,
 });
