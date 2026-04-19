@@ -568,5 +568,14 @@
         "argType": "boolean"
       }
     ]
+  },
+  {
+    "name": "connection_status",
+    "args": [
+      {
+        "name": "probe",
+        "argType": "boolean"
+      }
+    ]
   }
 ]

@@ -8,7 +8,7 @@ import {logger} from '../logger.js';
 import type {Browser} from '../third_party/index.js';
 
 import {ConnectionError} from './error.js';
-import {probeCdpEndpoint} from './probe.js';
+import {probeCdpEndpoint, type ProbeResult} from './probe.js';
 
 export interface ConnectWithRetryOptions {
   browserURL: string;
@@ -16,6 +16,7 @@ export interface ConnectWithRetryOptions {
   retryBudgetMs: number;
   verbose?: boolean;
   connect: () => Promise<Browser>;
+  onProbeResult?: (result: ProbeResult) => void;
   sleep?: (ms: number) => Promise<void>;
   now?: () => number;
 }
@@ -59,6 +60,7 @@ export async function connectWithRetry(
     retryBudgetMs,
     verbose = false,
     connect,
+    onProbeResult,
     sleep = defaultSleep,
     now = Date.now,
   } = options;
@@ -70,6 +72,7 @@ export async function connectWithRetry(
   while (true) {
     attempt++;
     const probe = await probeCdpEndpoint(browserURL, probeTimeoutMs);
+    onProbeResult?.(probe);
 
     if (probe.ok) {
       try {

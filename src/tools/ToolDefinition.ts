@@ -43,6 +43,7 @@ export interface BaseToolDefinition<
     readOnlyHint: boolean;
     conditions?: string[];
   };
+  requiresContext?: boolean;
   schema: Schema;
 }
 
@@ -99,6 +100,7 @@ export interface DevToolsData {
 
 export interface Response {
   appendResponseLine(value: string): void;
+  setStructuredContent(value: object): void;
   setIncludePages(value: boolean): void;
   setIncludeNetworkRequests(
     value: boolean,

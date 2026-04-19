@@ -16,6 +16,13 @@ import {
   isSessionStale,
   markDisconnected,
 } from './connection/session.js';
+import type {ConnectionEndpointSource} from './connection/status.js';
+import {
+  markConnectionAttached,
+  markConnectionDetached,
+  recordProbeResult,
+  setConnectionEndpoint,
+} from './connection/status.js';
 import {logger} from './logger.js';
 import type {
   Browser,
@@ -38,6 +45,7 @@ function detachDisconnectListener(): void {
 function attachDisconnectListener(b: Browser): void {
   detachDisconnectListener();
   const listener = () => {
+    markConnectionDetached();
     markDisconnected();
   };
   b.on('disconnected', listener);
@@ -88,6 +96,7 @@ export async function ensureBrowserConnected(options: {
   connectTimeout?: number;
   connectRetryBudget?: number;
   connectRetryVerbose?: boolean;
+  endpointSource?: ConnectionEndpointSource;
 }) {
   const {channel, enableExtensions} = options;
 
@@ -120,13 +129,24 @@ export async function ensureBrowserConnected(options: {
   };
 
   let autoConnect = false;
+  const endpointSource =
+    options.endpointSource ??
+    (options.wsEndpoint
+      ? 'wsEndpoint'
+      : options.browserURL
+        ? 'browserUrl'
+        : options.channel || options.userDataDir
+          ? 'autoDetect'
+          : 'default');
   if (options.wsEndpoint) {
     connectOptions.browserWSEndpoint = options.wsEndpoint;
+    setConnectionEndpoint(options.wsEndpoint, endpointSource);
     if (options.wsHeaders) {
       connectOptions.headers = options.wsHeaders;
     }
   } else if (options.browserURL) {
     connectOptions.browserURL = options.browserURL;
+    setConnectionEndpoint(options.browserURL, endpointSource);
   } else if (channel || options.userDataDir) {
     const userDataDir = options.userDataDir;
     if (userDataDir) {
@@ -152,6 +172,7 @@ export async function ensureBrowserConnected(options: {
         }
         const browserWSEndpoint = `ws://127.0.0.1:${port}${rawPath}`;
         connectOptions.browserWSEndpoint = browserWSEndpoint;
+        setConnectionEndpoint(browserWSEndpoint, endpointSource);
       } catch (error) {
         throw new Error(
           `Could not connect to Chrome in ${userDataDir}. Check if Chrome is running and remote debugging is enabled by going to chrome://inspect/#remote-debugging.`,
@@ -167,6 +188,7 @@ export async function ensureBrowserConnected(options: {
       connectOptions.channel = (
         channel === 'stable' ? 'chrome' : `chrome-${channel}`
       ) as ChromeReleaseChannel;
+      setConnectionEndpoint('', endpointSource);
     }
   } else {
     throw new Error(
@@ -182,11 +204,19 @@ export async function ensureBrowserConnected(options: {
       retryBudgetMs: options.connectRetryBudget ?? 15000,
       verbose: options.connectRetryVerbose ?? false,
       connect: () => puppeteer.connect(connectOptions),
+      onProbeResult: recordProbeResult,
     });
+    markConnectionAttached(connectOptions.browserURL);
     attachDisconnectListener(browser);
   } else {
     try {
       browser = await puppeteer.connect(connectOptions);
+      markConnectionAttached(
+        endpointSource === 'browserUrl' || endpointSource === 'default'
+          ? connectOptions.browserURL
+          : browser.wsEndpoint(),
+      );
+      attachDisconnectListener(browser);
     } catch (err) {
       throw new Error(
         `Could not connect to Chrome. ${autoConnect ? `Check if Chrome is running and remote debugging is enabled by going to chrome://inspect/#remote-debugging.` : `Check if Chrome is running.`}`,

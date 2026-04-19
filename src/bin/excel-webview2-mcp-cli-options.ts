@@ -8,6 +8,34 @@ import {WEBVIEW2_DEBUG_URL} from '../browser.js';
 import type {YargsOptions} from '../third_party/index.js';
 import {yargs, hideBin} from '../third_party/index.js';
 
+type ConnectionEndpointSource =
+  | 'browserUrl'
+  | 'wsEndpoint'
+  | 'autoDetect'
+  | 'default';
+
+const endpointSourceProperty = '__connectionEndpointSource';
+
+function hasFlag(
+  argv: string[],
+  longFlag: string,
+  shortFlag?: string,
+): boolean {
+  return argv.some(arg => {
+    return (
+      arg === longFlag ||
+      arg ===
+        `--${longFlag.slice(2).replace(/[A-Z]/g, match => `-${match.toLowerCase()}`)}` ||
+      arg.startsWith(`${longFlag}=`) ||
+      arg.startsWith(
+        `--${longFlag.slice(2).replace(/[A-Z]/g, match => `-${match.toLowerCase()}`)}=`,
+      ) ||
+      (shortFlag !== undefined &&
+        (arg === shortFlag || arg.startsWith(`${shortFlag}=`)))
+    );
+  });
+}
+
 export const cliOptions = {
   autoConnect: {
     type: 'boolean',
@@ -283,8 +311,32 @@ export const cliOptions = {
 
 export type ParsedArguments = ReturnType<typeof parseArguments>;
 
+export function getConnectionEndpointSource(
+  args: ParsedArguments,
+): ConnectionEndpointSource {
+  const explicitSource = (
+    args as ParsedArguments & {
+      [endpointSourceProperty]?: ConnectionEndpointSource;
+    }
+  )[endpointSourceProperty];
+  if (explicitSource) {
+    return explicitSource;
+  }
+  if (args.wsEndpoint) {
+    return 'wsEndpoint';
+  }
+  if (args.autoConnect) {
+    return 'autoDetect';
+  }
+  return args.browserUrl ? 'browserUrl' : 'default';
+}
+
 export function parseArguments(version: string, argv = process.argv) {
-  const yargsInstance = yargs(hideBin(argv))
+  const rawArgs = hideBin(argv);
+  const browserUrlExplicit = hasFlag(rawArgs, '--browserUrl', '-u');
+  const wsEndpointExplicit = hasFlag(rawArgs, '--wsEndpoint', '-w');
+  const autoConnectExplicit = hasFlag(rawArgs, '--autoConnect');
+  const yargsInstance = yargs(rawArgs)
     .scriptName('npx @dsbissett/excel-webview2-mcp@latest')
     .options(cliOptions)
     .check(args => {
@@ -363,9 +415,35 @@ export function parseArguments(version: string, argv = process.argv) {
       ],
     ]);
 
-  return yargsInstance
+  const parsedArgs = yargsInstance
     .wrap(Math.min(120, yargsInstance.terminalWidth()))
     .help()
     .version(version)
     .parseSync();
+
+  let endpointSource: ConnectionEndpointSource = 'default';
+  if (wsEndpointExplicit && parsedArgs.wsEndpoint) {
+    endpointSource = 'wsEndpoint';
+  } else if (autoConnectExplicit && parsedArgs.autoConnect) {
+    endpointSource = 'autoDetect';
+  } else if (browserUrlExplicit && parsedArgs.browserUrl) {
+    endpointSource = 'browserUrl';
+  } else if (parsedArgs.browserUrl === WEBVIEW2_DEBUG_URL) {
+    endpointSource = 'default';
+  } else if (parsedArgs.browserUrl) {
+    endpointSource = 'browserUrl';
+  } else if (parsedArgs.wsEndpoint) {
+    endpointSource = 'wsEndpoint';
+  } else if (parsedArgs.autoConnect) {
+    endpointSource = 'autoDetect';
+  }
+
+  Object.defineProperty(parsedArgs, endpointSourceProperty, {
+    value: endpointSource,
+    enumerable: false,
+    configurable: false,
+    writable: false,
+  });
+
+  return parsedArgs;
 }

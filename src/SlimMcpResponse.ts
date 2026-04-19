@@ -26,7 +26,7 @@ export class SlimMcpResponse extends McpResponse {
     };
     return {
       content: [text],
-      structuredContent: text,
+      structuredContent: this.structuredContentValue ?? text,
     };
   }
 }

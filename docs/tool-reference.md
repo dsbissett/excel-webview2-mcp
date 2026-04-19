@@ -1,6 +1,6 @@
 <!-- AUTO GENERATED DO NOT EDIT - run 'npm run gen' to update-->
 
-# Excel WebView2 MCP Tool Reference (~6202 cl100k_base tokens)
+# Excel WebView2 MCP Tool Reference (~6357 cl100k_base tokens)
 
 - **[Input automation](#input-automation)** (9 tools)
   - [`click`](#click)
@@ -30,7 +30,8 @@
 - **[Network](#network)** (2 tools)
   - [`get_network_request`](#get_network_request)
   - [`list_network_requests`](#list_network_requests)
-- **[Debugging](#debugging)** (6 tools)
+- **[Debugging](#debugging)** (7 tools)
+  - [`connection_status`](#connection_status)
   - [`evaluate_script`](#evaluate_script)
   - [`get_console_message`](#get_console_message)
   - [`lighthouse_audit`](#lighthouse_audit)
@@ -292,6 +293,16 @@
 ---
 
 ## Debugging
+
+### `connection_status`
+
+**Description:** Reports whether the server is currently attached to a browser and which CDP endpoint it is tracking.
+
+**Parameters:**
+
+- **probe** (boolean) _(optional)_: If true, re-runs the CDP /json/version probe for the tracked endpoint instead of returning cached probe state.
+
+---
 
 ### `evaluate_script`
 

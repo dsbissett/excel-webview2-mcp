@@ -63,6 +63,20 @@ export const commands: Commands = {
       },
     },
   },
+  connection_status: {
+    description:
+      'Reports whether the server is currently attached to a browser and which CDP endpoint it is tracking.',
+    category: 'Debugging',
+    args: {
+      probe: {
+        name: 'probe',
+        type: 'boolean',
+        description:
+          'If true, re-runs the CDP /json/version probe for the tracked endpoint instead of returning cached probe state.',
+        required: false,
+      },
+    },
+  },
   drag: {
     description: 'Drag an element onto another element',
     category: 'Input automation',

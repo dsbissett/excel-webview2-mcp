@@ -7,8 +7,10 @@
 import type fs from 'node:fs';
 
 import type {parseArguments} from './bin/excel-webview2-mcp-cli-options.js';
+import {getConnectionEndpointSource} from './bin/excel-webview2-mcp-cli-options.js';
 import type {Channel} from './browser.js';
 import {ensureBrowserConnected, ensureBrowserLaunched} from './browser.js';
+import {setConnectionEndpoint} from './connection/status.js';
 import {loadIssueDescriptions} from './issue-descriptions.js';
 import {logger} from './logger.js';
 import {McpContext} from './McpContext.js';
@@ -34,6 +36,20 @@ export async function createMcpServer(
     logFile?: fs.WriteStream;
   },
 ) {
+  if (serverArgs.wsEndpoint) {
+    setConnectionEndpoint(
+      serverArgs.wsEndpoint,
+      getConnectionEndpointSource(serverArgs),
+    );
+  } else if (serverArgs.browserUrl) {
+    setConnectionEndpoint(
+      serverArgs.browserUrl,
+      getConnectionEndpointSource(serverArgs),
+    );
+  } else if (serverArgs.autoConnect) {
+    setConnectionEndpoint('', getConnectionEndpointSource(serverArgs));
+  }
+
   let clearcutLogger: ClearcutLogger | undefined;
   if (serverArgs.usageStatistics) {
     clearcutLogger = new ClearcutLogger({
@@ -96,6 +112,7 @@ export async function createMcpServer(
             connectTimeout: serverArgs.connectTimeout,
             connectRetryBudget: serverArgs.connectRetryBudget,
             connectRetryVerbose: serverArgs.connectRetryVerbose,
+            endpointSource: getConnectionEndpointSource(serverArgs),
           })
         : await ensureBrowserLaunched({
             headless: serverArgs.headless,
@@ -192,15 +209,21 @@ export async function createMcpServer(
         let success = false;
         try {
           logger(`${tool.name} request: ${JSON.stringify(params, null, '  ')}`);
-          const context = await getContext();
-          logger(`${tool.name} context: resolved`);
-          await context.detectOpenDevToolsWindows();
+          const requiresContext = tool.requiresContext !== false;
+          const context = requiresContext ? await getContext() : undefined;
+          if (context) {
+            logger(`${tool.name} context: resolved`);
+            await context.detectOpenDevToolsWindows();
+          }
           const response = serverArgs.slim
             ? new SlimMcpResponse(serverArgs)
             : new McpResponse(serverArgs);
 
           response.setRedactNetworkHeaders(serverArgs.redactNetworkHeaders);
           if ('pageScoped' in tool && tool.pageScoped) {
+            if (!context) {
+              throw new Error(`Tool ${tool.name} requires a browser context.`);
+            }
             const page =
               serverArgs.experimentalPageIdRouting &&
               params.pageId &&
@@ -223,12 +246,12 @@ export async function createMcpServer(
                 params,
               },
               response,
-              context,
+              context as McpContext,
             );
           }
           const {content, structuredContent} = await response.handle(
             tool.name,
-            context,
+            (context ?? ({} as McpContext)) as McpContext,
           );
           const result: CallToolResult & {
             structuredContent?: Record<string, unknown>;

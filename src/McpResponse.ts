@@ -183,6 +183,7 @@ export class McpResponse implements Response {
   #listInPageTools?: boolean;
   #devToolsData?: DevToolsData;
   #tabId?: string;
+  #customStructuredContent?: object;
   #args: ParsedArguments;
   #page?: McpPage;
   #redactNetworkHeaders = true;
@@ -358,12 +359,20 @@ export class McpResponse implements Response {
     this.#textResponseLines.push(value);
   }
 
+  setStructuredContent(value: object): void {
+    this.#customStructuredContent = value;
+  }
+
   attachImage(value: ImageContentData): void {
     this.#images.push(value);
   }
 
   get responseLines(): readonly string[] {
     return this.#textResponseLines;
+  }
+
+  get structuredContentValue(): object | undefined {
+    return this.#customStructuredContent;
   }
 
   get images(): ImageContentData[] {
@@ -611,36 +620,10 @@ export class McpResponse implements Response {
       inPageTools?: ToolGroup<ToolDefinition>;
     },
   ): {content: Array<TextContent | ImageContent>; structuredContent: object} {
-    const structuredContent: {
-      snapshot?: object;
-      snapshotFilePath?: string;
-      tabId?: string;
-      networkRequest?: object;
-      networkRequests?: object[];
-      consoleMessage?: object;
-      consoleMessages?: object[];
-      traceSummary?: string;
-      traceInsights?: Array<{insightName: string; insightKey: string}>;
-      lighthouseResult?: object;
-      extensions?: object[];
-      inPageTools?: object;
-      message?: string;
-      networkConditions?: string;
-      navigationTimeout?: number;
-      viewport?: object;
-      userAgent?: string;
-      cpuThrottlingRate?: number;
-      colorScheme?: string;
-      dialog?: {
-        type: string;
-        message: string;
-        defaultValue?: string;
-      };
-      pages?: object[];
-      pagination?: object;
-      extensionServiceWorkers?: object[];
-      extensionPages?: object[];
-    } = {};
+    const structuredContent: Record<string, unknown> = this
+      .structuredContentValue
+      ? {...(this.structuredContentValue as Record<string, unknown>)}
+      : {};
 
     const response = [];
     if (this.#textResponseLines.length) {
@@ -776,10 +759,12 @@ Call ${handleDialog.name} to handle it before continuing.`);
       const summary = getTraceSummary(data.traceSummary);
       response.push(summary);
       structuredContent.traceSummary = summary;
-      structuredContent.traceInsights = [];
+      const traceInsights: Array<{insightName: string; insightKey: string}> =
+        [];
+      structuredContent.traceInsights = traceInsights;
       for (const insightSet of data.traceSummary.insights?.values() ?? []) {
         for (const [insightName, model] of Object.entries(insightSet.model)) {
-          structuredContent.traceInsights.push({
+          traceInsights.push({
             insightName,
             insightKey: model.insightKey,
           });
@@ -893,10 +878,11 @@ Call ${handleDialog.name} to handle it before continuing.`);
         structuredContent.pagination = paginationData.pagination;
         response.push(...paginationData.info);
         if (data.networkRequests) {
-          structuredContent.networkRequests = [];
+          const networkRequests: object[] = [];
+          structuredContent.networkRequests = networkRequests;
           for (const formatter of paginationData.items) {
             response.push(formatter.toString());
-            structuredContent.networkRequests.push(formatter.toJSON());
+            networkRequests.push(formatter.toJSON());
           }
         }
       } else {
