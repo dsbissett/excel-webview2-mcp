@@ -9,7 +9,8 @@ export type ConnectionErrorReason =
   | 'timeout'
   | 'invalid-response'
   | `http-error:${number}`
-  | 'connect-failed';
+  | 'connect-failed'
+  | 'unstable';
 
 export interface ConnectionErrorOptions {
   url: string;

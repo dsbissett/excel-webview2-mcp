@@ -10,6 +10,12 @@ import os from 'node:os';
 import path from 'node:path';
 
 import {connectWithRetry} from './connection/retry.js';
+import {
+  beginReconnect,
+  getStickyError,
+  isSessionStale,
+  markDisconnected,
+} from './connection/session.js';
 import {logger} from './logger.js';
 import type {
   Browser,
@@ -20,8 +26,25 @@ import type {
 import {puppeteer} from './third_party/index.js';
 
 let browser: Browser | undefined;
+let activeDisconnectListener: (() => void) | undefined;
 
 export const WEBVIEW2_DEBUG_URL = 'http://localhost:9222';
+
+function detachDisconnectListener(): void {
+  activeDisconnectListener?.();
+  activeDisconnectListener = undefined;
+}
+
+function attachDisconnectListener(b: Browser): void {
+  detachDisconnectListener();
+  const listener = () => {
+    markDisconnected();
+  };
+  b.on('disconnected', listener);
+  activeDisconnectListener = () => {
+    b.off('disconnected', listener);
+  };
+}
 
 function makeTargetFilter(enableExtensions = false) {
   const ignoredPrefixes = new Set(['chrome://', 'chrome-untrusted://']);
@@ -67,8 +90,24 @@ export async function ensureBrowserConnected(options: {
   connectRetryVerbose?: boolean;
 }) {
   const {channel, enableExtensions} = options;
-  if (browser?.connected) {
+
+  const sticky = getStickyError();
+  if (sticky) {
+    throw sticky;
+  }
+
+  if (browser?.connected && !isSessionStale()) {
     return browser;
+  }
+
+  if (isSessionStale()) {
+    const reconnectUrl = options.browserURL ?? WEBVIEW2_DEBUG_URL;
+    const blocker = beginReconnect(reconnectUrl);
+    if (blocker) {
+      throw blocker;
+    }
+    detachDisconnectListener();
+    browser = undefined;
   }
 
   const isWebView2 = options.webview2 ?? false;
@@ -144,6 +183,7 @@ export async function ensureBrowserConnected(options: {
       verbose: options.connectRetryVerbose ?? false,
       connect: () => puppeteer.connect(connectOptions),
     });
+    attachDisconnectListener(browser);
   } else {
     try {
       browser = await puppeteer.connect(connectOptions);
