@@ -72,6 +72,18 @@ export const cliOptions = {
       'Timeout in milliseconds for the pre-connect health probe against /json/version. Default 5000.',
     default: 5000,
   },
+  connectRetryBudget: {
+    type: 'number',
+    description:
+      'Total time budget in milliseconds for retrying initial connection with exponential backoff. Set to 0 to disable retries (fail-fast). Default 15000.',
+    default: 15000,
+  },
+  connectRetryVerbose: {
+    type: 'boolean',
+    description:
+      'If true, log each connection retry attempt to stderr so users can see progress.',
+    default: false,
+  },
   wsHeaders: {
     type: 'string',
     description:

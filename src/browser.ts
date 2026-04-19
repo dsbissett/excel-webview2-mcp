@@ -9,8 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import {ConnectionError} from './connection/error.js';
-import {probeCdpEndpoint} from './connection/probe.js';
+import {connectWithRetry} from './connection/retry.js';
 import {logger} from './logger.js';
 import type {
   Browser,
@@ -64,6 +63,8 @@ export async function ensureBrowserConnected(options: {
   enableExtensions?: boolean;
   webview2?: boolean;
   connectTimeout?: number;
+  connectRetryBudget?: number;
+  connectRetryVerbose?: boolean;
 }) {
   const {channel, enableExtensions} = options;
   if (browser?.connected) {
@@ -134,38 +135,26 @@ export async function ensureBrowserConnected(options: {
     );
   }
 
-  if (connectOptions.browserURL) {
-    const probeUrl = connectOptions.browserURL;
-    const timeoutMs = options.connectTimeout ?? 5000;
-    const probe = await probeCdpEndpoint(probeUrl, timeoutMs);
-    if (!probe.ok) {
-      throw new ConnectionError({
-        url: probeUrl,
-        reason: probe.reason ?? 'unreachable',
-        hint: `Run: curl ${probeUrl}/json/version — if this fails, your Excel add-in isn't exposing the debug port.`,
-      });
-    }
-  }
-
   logger('Connecting Puppeteer to ', JSON.stringify(connectOptions));
-  try {
-    browser = await puppeteer.connect(connectOptions);
-  } catch (err) {
-    const probeUrl = connectOptions.browserURL;
-    if (probeUrl) {
-      throw new ConnectionError({
-        url: probeUrl,
-        reason: 'connect-failed',
-        hint: `Run: curl ${probeUrl}/json/version — if this fails, your Excel add-in isn't exposing the debug port.`,
-        cause: err,
-      });
+  if (connectOptions.browserURL) {
+    browser = await connectWithRetry({
+      browserURL: connectOptions.browserURL,
+      probeTimeoutMs: options.connectTimeout ?? 5000,
+      retryBudgetMs: options.connectRetryBudget ?? 15000,
+      verbose: options.connectRetryVerbose ?? false,
+      connect: () => puppeteer.connect(connectOptions),
+    });
+  } else {
+    try {
+      browser = await puppeteer.connect(connectOptions);
+    } catch (err) {
+      throw new Error(
+        `Could not connect to Chrome. ${autoConnect ? `Check if Chrome is running and remote debugging is enabled by going to chrome://inspect/#remote-debugging.` : `Check if Chrome is running.`}`,
+        {
+          cause: err,
+        },
+      );
     }
-    throw new Error(
-      `Could not connect to Chrome. ${autoConnect ? `Check if Chrome is running and remote debugging is enabled by going to chrome://inspect/#remote-debugging.` : `Check if Chrome is running.`}`,
-      {
-        cause: err,
-      },
-    );
   }
   logger('Connected Puppeteer');
   return browser;
