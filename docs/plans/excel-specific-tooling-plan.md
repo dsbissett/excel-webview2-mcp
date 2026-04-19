@@ -447,6 +447,7 @@ In `src/tools/excel.ts`, add `excelActiveRange`:
    - `list_pages` still works; `take_snapshot` still works.
 7. Run the Gemini eval (`npm run eval` or equivalent) with `--include-skill` pointing at `excel-addin-debugging`. All scenarios should pass.
 8. Update [CHANGELOG.md](../../CHANGELOG.md) (if present) with a summary of the tool surface changes.
+9. **Reconcile Phase 6 "kept" scenarios with pruned navigation tools.** Phase 6 task list instructed keeping `console_test.ts`, `snapshot_test.ts`, `input_test.ts`, `input_parallel_test.ts`, `network_test.ts`, `performance_test.ts`, `frontend_snapshot_test.ts`, `page_focus_keyboard_test.ts`, but each still asserts on `navigate_page` / `new_page` — tools removed in Phase 1. Phase 6's own verification checklist ("no files referencing `navigate`, `newPage`") conflicts with that. Resolve by either (a) rewriting each scenario to attach to a running fixture target without navigation (matches the WebView2 attach model), or (b) deleting scenarios that cannot be expressed without navigation. Run `grep -rn "navigate_page\|new_page" scripts/eval_scenarios/` and drive it to zero hits before running the Gemini eval in task 7.
 
 ### Anti-pattern checks
 
