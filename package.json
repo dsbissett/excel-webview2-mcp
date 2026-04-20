@@ -1,6 +1,6 @@
 {
   "name": "@dsbissett/excel-webview2-mcp",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "MCP server for Excel add-ins via WebView2 CDP",
   "type": "module",
   "bin": {
@@ -30,7 +30,8 @@
     "update-tool-call-metrics": "node --experimental-strip-types scripts/update_tool_call_metrics.ts",
     "verify-npm-package": "node scripts/verify-npm-package.mjs",
     "eval": "npm run build && node --experimental-strip-types scripts/eval_gemini.ts",
-    "count-tokens": "node --experimental-strip-types scripts/count_tokens.ts"
+    "count-tokens": "node --experimental-strip-types scripts/count_tokens.ts",
+    "bump-version": "node scripts/bump-version.mjs"
   },
   "files": [
     "build/src",

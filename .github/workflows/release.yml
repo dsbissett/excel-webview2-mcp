@@ -50,7 +50,7 @@ jobs:
 
       - name: Build
         if: steps.release-tag.outputs.found == 'true'
-        run: npm run build
+        run: npm run bundle
 
       - name: Read package metadata
         if: steps.release-tag.outputs.found == 'true'

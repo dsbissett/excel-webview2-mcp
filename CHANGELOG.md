@@ -2,6 +2,12 @@
 
 All notable changes since commit `412b24e` are documented here.
 
+## [0.0.3]
+
+### Fixed
+
+- Release workflow now runs `npm run bundle` (rollup) instead of `npm run build` (tsc only) before publishing. The previous v0.0.2 package shipped with unresolved `core-js` imports in `build/src/third_party/index.js` because `core-js` lives in `devDependencies`. End users hit `ERR_MODULE_NOT_FOUND: Cannot find package 'core-js'` on startup, preventing any MCP tools from being exposed. Bundling inlines the polyfills into `third_party/index.js` so the published package is self-contained.
+
 ## [0.0.2]
 
 ### Added
