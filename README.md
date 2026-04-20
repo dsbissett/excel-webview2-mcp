@@ -11,9 +11,26 @@ Professional MCP connectivity for Microsoft Excel add-ins running inside WebView
 | Recommended setup | Claude Code plugin marketplace               |
 
 > [!IMPORTANT]
-> This project does **not** launch Excel, start your add-in, or create a browser session.
-> It only connects Claude Code to an **already-running** WebView2 remote debugging endpoint on port `9222`.
-> Your Excel add-in must already be running locally and actively being debugged before this server can do anything useful.
+> As of **v0.0.2**, this server can launch Excel and sideload your add-in for you. You no longer need to start the dev server or attach a debugger before using it — `excel_launch_addin` will start your local dev server (if configured) and launch Excel with WebView2 remote debugging enabled on port `9222`.
+> Manual pre-launch is still supported: if an Excel add-in is already running with remote debugging on `9222`, the server will attach to it.
+
+## What's New in v0.0.2
+
+- **Add-in lifecycle management** — new tools launch and stop Excel add-ins directly from Claude Code:
+  - [excel_detect_addin](src/tools/lifecycle.ts) — discover manifest and dev server configuration for the current project.
+  - [excel_launch_addin](src/tools/lifecycle.ts) — start the dev server (if needed) and launch Excel with the add-in sideloaded and CDP port `9222` enabled.
+  - [excel_stop_addin](src/tools/lifecycle.ts) — tear down the launched Excel session and dev server process tree.
+- **Read-only Excel inspection tools** — a broad set of read operations for inspecting workbooks, worksheets, ranges, tables, pivots, charts, and more. None of these mutate workbook state:
+  - Context & structure: `excel_context_info`, `excel_workbook_info`, `excel_list_worksheets`, `excel_worksheet_info`, `excel_active_range`, `excel_used_range`.
+  - Range reads: `excel_read_range`, `excel_range_properties`, `excel_range_formulas`, `excel_range_special_cells`, `excel_find_in_range`.
+  - Formatting & validation: `excel_list_conditional_formats`, `excel_list_data_validations`.
+  - Tables & names: `excel_list_tables`, `excel_table_info`, `excel_table_rows`, `excel_table_filters`, `excel_list_named_items`.
+  - Comments & shapes: `excel_list_comments`, `excel_list_shapes`.
+  - Calculation & pivots: `excel_calculation_state`, `excel_list_pivot_tables`, `excel_pivot_table_info`, `excel_pivot_table_values`.
+  - Charts: `excel_list_charts`, `excel_chart_info`, `excel_chart_image`.
+  - Misc: `excel_custom_xml_parts`, `excel_settings_get`.
+- **Socket-based port detection** replaces HTTP polling for more reliable dev-server and CDP readiness checks on Node 24.
+- **Robust cleanup on Windows** — `excel_stop_addin` now force-kills the dev server process tree via `taskkill`.
 
 ## Fork Notice
 
@@ -44,24 +61,27 @@ That separation matters: `excel-webview2-mcp` is a bridge to an existing debug s
 
 ## Prerequisites
 
-Before using this server, make sure all of the following are true:
+You have two supported workflows:
 
-1. Your Excel add-in is loaded in the local Excel desktop client.
-2. The add-in is already running under local debugging.
-3. WebView2 remote debugging is enabled and bound to port `9222`.
-4. The debugging endpoint is reachable at `http://127.0.0.1:9222`.
-5. Claude Code can run `npx @dsbissett/excel-webview2-mcp@latest`.
+### Auto-launch (recommended, v0.0.2+)
 
-The exact way you enable WebView2 remote debugging depends on your Office add-in launch workflow, but the end result must be a live CDP endpoint on port `9222`.
+1. Your Office add-in project (with a `manifest.xml` and a dev server script) lives on disk.
+2. Excel desktop is installed on Windows.
+3. Node.js is installed and `npx @dsbissett/excel-webview2-mcp@latest` is runnable.
 
-To verify that the endpoint is available before starting Claude Code:
+Call `excel_detect_addin` first to confirm the project is discovered, then `excel_launch_addin` to start the dev server and sideload the add-in into Excel with CDP port `9222` enabled. Use `excel_stop_addin` to tear everything down.
+
+### Manual / pre-attached
+
+1. Your Excel add-in is already loaded and running in the local Excel desktop client.
+2. WebView2 remote debugging is enabled and bound to port `9222` (see [Launching Excel with the debug port](#launching-excel-with-the-debug-port)).
+3. The debugging endpoint is reachable at `http://127.0.0.1:9222`.
+
+Verify with:
 
 ```sh
 curl http://127.0.0.1:9222/json
 ```
-
-> [!WARNING]
-> If the add-in is not already running locally with remote debugging enabled on port `9222`, this server has nothing to attach to.
 
 ## Launching Excel with the debug port
 
@@ -133,16 +153,11 @@ A healthy response is JSON and includes fields such as:
 
 If that `curl` command fails, Excel is not exposing the WebView2 debug port yet, and `excel-webview2-mcp` will not be able to attach.
 
-## Claude Code Setup
+## Installation
 
-The recommended path is to install this project through the bundled Claude Code plugin marketplace metadata included in this repository.
+The server ships as the npm package `@dsbissett/excel-webview2-mcp` and is invoked via `npx`. The configuration below is the same across every host — only the location of the config file changes.
 
-1. Add the plugin marketplace from [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) to Claude Code.
-2. Install the `excel-webview2-mcp` plugin from that marketplace.
-3. Start Excel and run your add-in locally with WebView2 remote debugging enabled on port `9222`.
-4. Open Claude Code and connect through the installed plugin.
-
-The plugin definition is stored in [`.claude-plugin/plugin.json`](.claude-plugin/plugin.json) and uses this MCP server entry:
+Canonical MCP entry:
 
 ```json
 {
@@ -155,22 +170,83 @@ The plugin definition is stored in [`.claude-plugin/plugin.json`](.claude-plugin
 }
 ```
 
-## Direct MCP Configuration
+<details>
+<summary><strong>Claude Code (CLI)</strong></summary>
 
-If you prefer to configure Claude Code manually instead of installing the plugin, add the same server entry directly:
+One-liner:
 
-```json
-{
-  "mcpServers": {
-    "excel-webview2": {
-      "command": "npx",
-      "args": ["@dsbissett/excel-webview2-mcp@latest"]
-    }
-  }
-}
+```sh
+claude mcp add excel-webview2 -- npx @dsbissett/excel-webview2-mcp@latest
 ```
 
-By default, the server connects to the local WebView2 debugging endpoint at `http://localhost:9222`.
+Use `claude mcp add --scope user ...` to make the server available in every project, or `--scope project` to check the config into `.mcp.json` for teammates.
+
+Alternatively, install the bundled plugin:
+
+1. Add the marketplace from [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) with `/plugin marketplace add dsbissett/excel-webview2-mcp`.
+2. Install with `/plugin install excel-webview2-mcp`.
+
+</details>
+
+<details>
+<summary><strong>Claude Code (VS Code extension)</strong></summary>
+
+1. Open the Claude Code side panel in VS Code.
+2. Open the command palette and run **Claude Code: Manage MCP Servers** (or click the MCP icon in the Claude panel).
+3. Choose **Add Server** and paste the canonical MCP entry above, or run the `claude mcp add` command in the VS Code integrated terminal — the extension reads the same config.
+
+</details>
+
+<details>
+<summary><strong>Cursor</strong></summary>
+
+Edit `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` in the project root and add the canonical MCP entry above. Restart Cursor, then open **Settings → MCP** to confirm `excel-webview2` shows as connected.
+
+</details>
+
+<details>
+<summary><strong>Codex (OpenAI Codex CLI)</strong></summary>
+
+Codex reads MCP servers from `~/.codex/config.toml`. Add:
+
+```toml
+[mcp_servers.excel-webview2]
+command = "npx"
+args = ["@dsbissett/excel-webview2-mcp@latest"]
+```
+
+Then launch `codex` and confirm the server appears in `/mcp`.
+
+</details>
+
+<details>
+<summary><strong>GitHub Copilot (VS Code)</strong></summary>
+
+GitHub Copilot Chat in VS Code supports MCP servers through the agent-mode configuration.
+
+1. Create or edit `.vscode/mcp.json` in your workspace (or the user-level `mcp.json` via **MCP: Open User Configuration** from the command palette).
+2. Add the server entry:
+
+   ```json
+   {
+     "servers": {
+       "excel-webview2": {
+         "command": "npx",
+         "args": ["@dsbissett/excel-webview2-mcp@latest"]
+       }
+     }
+   }
+   ```
+
+3. Open Copilot Chat, switch to **Agent** mode, and click the **Tools** icon to confirm the `excel-webview2` tools are available. Use **MCP: List Servers** from the command palette to inspect status or restart the server.
+
+</details>
+
+### Verifying the install
+
+After adding the server, ask the model to call `excel_detect_addin` from your Office add-in project directory. A successful response confirms the MCP server is wired up; from there `excel_launch_addin` will take care of starting Excel.
+
+By default, the server connects to the local WebView2 debugging endpoint at `http://127.0.0.1:9222`.
 
 ## Local Development
 
