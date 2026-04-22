@@ -1,17 +1,19 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.dsbissett/excel-webview2-mcp",
-  "description": "MCP server for Excel add-ins via WebView2 CDP",
+  "title": "Excel WebView2 MCP",
+  "description": "MCP server for automating and debugging Excel add-ins running in WebView2 via the Chrome DevTools Protocol",
   "repository": {
     "url": "https://github.com/dsbissett/excel-webview2-mcp",
     "source": "github"
   },
-  "version": "0.0.4",
+  "version": "0.0.3",
   "packages": [
     {
       "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@dsbissett/excel-webview2-mcp",
-      "version": "0.0.4",
+      "version": "0.0.3",
       "transport": {
         "type": "stdio"
       }

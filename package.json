@@ -1,6 +1,6 @@
 {
   "name": "@dsbissett/excel-webview2-mcp",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "MCP server for Excel add-ins via WebView2 CDP",
   "type": "module",
   "bin": {
@@ -38,14 +38,17 @@
     "LICENSE",
     "!*.tsbuildinfo"
   ],
-  "repository": "dsbissett/excel-webview2-mcp",
-  "author": "Doug Bissett",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dsbissett/excel-webview2-mcp.git"
+  },
+  "author": "Drake Bissett",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/dsbissett/excel-webview2-mcp/issues"
   },
   "homepage": "https://github.com/dsbissett/excel-webview2-mcp#readme",
-  "mcpName": "excel-webview2-mcp",
+  "mcpName": "io.github.dsbissett/excel-webview2-mcp",
   "devDependencies": {
     "@eslint/js": "^9.35.0",
     "@google/genai": "^1.37.0",
