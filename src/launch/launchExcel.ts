@@ -582,7 +582,10 @@ async function ensureDevServerRunning(args: {
     };
   }
 
-  const runner = resolvePackageRunner(args.project.packageManager);
+  const runner = await resolvePackageRunner(
+    args.project.packageManager,
+    args.deps,
+  );
   const output: string[] = [];
   let child: LaunchChildProcess;
   try {
@@ -669,10 +672,25 @@ async function isPortListening(
   });
 }
 
-function resolvePackageRunner(
+async function resolvePackageRunner(
   packageManager: AddinProject['packageManager'],
-): string {
-  return packageManager;
+  deps: LaunchExcelDeps,
+): Promise<string> {
+  if (deps.processRef.platform !== 'win32') {
+    return packageManager;
+  }
+
+  // Resolve the package manager's .cmd shim to an absolute path via the
+  // parent process's PATH. Spawning an unqualified name under shell:true with
+  // cwd=project root lets cmd.exe pick up stray shims (e.g. something in the
+  // cwd or in node_modules/.bin that we prepend to PATH for the child), and
+  // the shipped npm.cmd shim resolves `%~dp0\node_modules\npm\bin\npm-prefix.js`
+  // against its own location — so the wrong shim breaks npm entirely.
+  const absolute = await resolveCommandOnPath(`${packageManager}.cmd`, deps);
+  if (absolute) {
+    return absolute;
+  }
+  return `${packageManager}.cmd`;
 }
 
 function spawnPackageScript(
@@ -687,17 +705,16 @@ function spawnPackageScript(
   },
 ): LaunchChildProcess {
   const isWindows = deps.processRef.platform === 'win32';
-  const command = isWindows ? `${runner}.cmd` : runner;
   const args = ['run', script];
 
   if (isWindows) {
-    return deps.spawn(`"${command}"`, args.map(quoteWindowsShellArg), {
+    return deps.spawn(`"${runner}"`, args.map(quoteWindowsShellArg), {
       ...options,
       shell: true,
     }) as LaunchChildProcess;
   }
 
-  return deps.spawn(command, args, options) as LaunchChildProcess;
+  return deps.spawn(runner, args, options) as LaunchChildProcess;
 }
 
 function attachOutputBuffer(child: LaunchChildProcess, output: string[]): void {
