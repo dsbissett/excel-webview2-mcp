@@ -163,6 +163,23 @@ export function resetLaunchStateForTesting(): void {
   resetRuntimeState(defaultState, defaultDeps.processRef);
 }
 
+export async function shutdownAllLaunches(timeoutMs = 5000): Promise<void> {
+  if (defaultState.tracked.size === 0) {
+    return;
+  }
+  const graceful = stopAllTrackedLaunches(defaultState, defaultDeps);
+  const timeout = new Promise<void>(resolve =>
+    setTimeout(resolve, timeoutMs).unref?.(),
+  );
+  await Promise.race([graceful, timeout]);
+  for (const tracked of defaultState.tracked.values()) {
+    killChild(tracked.child);
+    if (tracked.devServer && !tracked.devServer.preexisting) {
+      killChild(tracked.devServer.child);
+    }
+  }
+}
+
 function createLaunchExcelImpl(
   deps: LaunchExcelDeps,
   state: LaunchRuntimeState,

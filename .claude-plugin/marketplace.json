@@ -1,6 +1,6 @@
 {
   "name": "excel-webview2-plugins",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Plugins for automating and debugging Excel add-ins via WebView2.",
   "repository": "https://github.com/dsbissett/excel-webview2-mcp",
   "owner": {
