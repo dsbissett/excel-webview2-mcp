@@ -6,12 +6,12 @@
     "url": "https://github.com/dsbissett/excel-webview2-mcp",
     "source": "github"
   },
-  "version": "0.0.12",
+  "version": "0.0.13",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@dsbissett/excel-webview2-mcp",
-      "version": "0.0.12",
+      "version": "0.0.13",
       "transport": {
         "type": "stdio"
       }
