@@ -252,6 +252,125 @@ describe('lifecycle tools', () => {
       assert.ok(noop.captured.lines.some(line => line.includes('No tracked')));
     });
 
+    it('runs force-shutdown fallback when stop() throws and surfaces success when ports clear', async () => {
+      const detected = project();
+      const stopStub = sinon.stub().rejects(new Error('graceful stop failed'));
+      const forceShutdownStub = sinon.stub().resolves({
+        taskkillOutput: 'SUCCESS: excel.exe terminated',
+        port3000CleanupOutput: 'killed pid 0',
+        finalCleanupOutput: '',
+        remaining: [],
+      });
+      setLifecycleDepsForTesting({
+        detectExcelAddin: async () => detected,
+        launchExcel: async () => ({
+          pid: 42,
+          cdpUrl: 'http://localhost:9222',
+          stop: stopStub,
+        }),
+        ensureBrowserConnected: (async () => ({})) as never,
+        forceShutdownAddinProcesses: forceShutdownStub,
+      });
+
+      const launchTool = excelLaunchAddin();
+      await launchTool.handler(
+        {params: {autoConnect: false}},
+        makeResponse().response as never,
+        {} as never,
+      );
+
+      const stopResponse = makeResponse();
+      await excelStopAddin.handler(
+        {params: {}},
+        stopResponse.response as never,
+        {} as never,
+      );
+
+      assert.strictEqual(forceShutdownStub.callCount, 1);
+      assert.ok(
+        stopResponse.captured.lines.some(line =>
+          line.includes('force-shutdown fallback'),
+        ),
+      );
+      assert.ok(
+        stopResponse.captured.lines.some(line =>
+          line.includes('Force-shutdown verified'),
+        ),
+      );
+    });
+
+    it('throws ToolError when force-shutdown leaves ports bound', async () => {
+      const {ToolError} = await import('../../src/tools/ToolError.js');
+      const detected = project();
+      const stopStub = sinon.stub().rejects(new Error('graceful stop failed'));
+      const forceShutdownStub = sinon.stub().resolves({
+        taskkillOutput: '',
+        port3000CleanupOutput: '',
+        finalCleanupOutput: '',
+        remaining: [{port: 3000, pid: 1234, state: 'Listen'}],
+      });
+      setLifecycleDepsForTesting({
+        detectExcelAddin: async () => detected,
+        launchExcel: async () => ({
+          pid: 42,
+          cdpUrl: 'http://localhost:9222',
+          stop: stopStub,
+        }),
+        ensureBrowserConnected: (async () => ({})) as never,
+        forceShutdownAddinProcesses: forceShutdownStub,
+      });
+
+      const launchTool = excelLaunchAddin();
+      await launchTool.handler(
+        {params: {autoConnect: false}},
+        makeResponse().response as never,
+        {} as never,
+      );
+
+      await assert.rejects(
+        async () =>
+          excelStopAddin.handler(
+            {params: {}},
+            makeResponse().response as never,
+            {} as never,
+          ),
+        (err: unknown) =>
+          err instanceof ToolError &&
+          err.category === 'internal' &&
+          err.isRetryable === true &&
+          err.message.includes('port=3000'),
+      );
+    });
+
+    it('does not invoke force-shutdown when graceful stop succeeds', async () => {
+      const detected = project();
+      const stopStub = sinon.stub().resolves();
+      const forceShutdownStub = sinon.stub();
+      setLifecycleDepsForTesting({
+        detectExcelAddin: async () => detected,
+        launchExcel: async () => ({
+          pid: 42,
+          cdpUrl: 'http://localhost:9222',
+          stop: stopStub,
+        }),
+        ensureBrowserConnected: (async () => ({})) as never,
+        forceShutdownAddinProcesses: forceShutdownStub,
+      });
+
+      const launchTool = excelLaunchAddin();
+      await launchTool.handler(
+        {params: {autoConnect: false}},
+        makeResponse().response as never,
+        {} as never,
+      );
+      await excelStopAddin.handler(
+        {params: {}},
+        makeResponse().response as never,
+        {} as never,
+      );
+      assert.strictEqual(forceShutdownStub.callCount, 0);
+    });
+
     it('reports missing manifest without stopping anything', async () => {
       setLifecycleDepsForTesting({});
       const {response, captured} = makeResponse();

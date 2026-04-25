@@ -8,16 +8,22 @@ import {
   type LaunchOptions,
   type LaunchResult,
 } from '../launch/launchExcel.js';
+import {
+  forceShutdownAddinProcesses as forceShutdownImpl,
+  type ForceShutdownResult,
+} from '../launch/forceShutdown.js';
 
 export type DetectFn = (cwd: string) => Promise<AddinProject | null>;
 export type LaunchFn = (options: LaunchOptions) => Promise<LaunchResult>;
 export type ConnectFn = typeof ensureBrowserConnected;
+export type ForceShutdownFn = () => Promise<ForceShutdownResult>;
 
 export interface LifecycleDeps {
   detectExcelAddin: DetectFn;
   launchExcel: LaunchFn;
   ensureBrowserConnected: ConnectFn;
   cwd: () => string;
+  forceShutdownAddinProcesses: ForceShutdownFn;
 }
 
 export interface TrackedLaunchEntry {
@@ -30,6 +36,7 @@ const defaultDeps: LifecycleDeps = {
   launchExcel: launchExcelImpl,
   ensureBrowserConnected,
   cwd: () => process.cwd(),
+  forceShutdownAddinProcesses: forceShutdownImpl,
 };
 
 let currentDeps: LifecycleDeps = defaultDeps;

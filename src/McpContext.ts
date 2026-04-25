@@ -27,6 +27,7 @@ import {Locator} from './third_party/index.js';
 import {PredefinedNetworkConditions} from './third_party/index.js';
 import {listPages} from './tools/pages.js';
 import {CLOSE_PAGE_ERROR} from './tools/ToolDefinition.js';
+import {ToolError} from './tools/ToolError.js';
 import type {Context, DevToolsData} from './tools/ToolDefinition.js';
 import type {TraceResult} from './trace-processing/parse.js';
 import type {
@@ -393,12 +394,28 @@ export class McpContext implements Context {
   getSelectedPptrPage(): Page {
     const page = this.#selectedPage;
     if (!page) {
-      throw new Error('No page selected');
+      throw new ToolError({
+        category: 'not_found',
+        isRetryable: false,
+        message: 'No page selected',
+        context: {
+          toolName: 'McpContext',
+          attempted: 'resolve selected page',
+          failed: 'no page selected',
+        },
+      });
     }
     if (page.pptrPage.isClosed()) {
-      throw new Error(
-        `The selected page has been closed. Call ${listPages().name} to see open pages.`,
-      );
+      throw new ToolError({
+        category: 'not_found',
+        isRetryable: false,
+        message: `The selected page has been closed. Call ${listPages().name} to see open pages.`,
+        context: {
+          toolName: 'McpContext',
+          attempted: 'resolve selected page',
+          failed: 'selected page is closed',
+        },
+      });
     }
     return page.pptrPage;
   }
@@ -411,7 +428,17 @@ export class McpContext implements Context {
   getPageById(pageId: number): McpPage {
     const page = this.#mcpPages.values().find(mcpPage => mcpPage.id === pageId);
     if (!page) {
-      throw new Error('No page found');
+      throw new ToolError({
+        category: 'not_found',
+        isRetryable: false,
+        message: `No page found with id ${pageId}`,
+        context: {
+          toolName: 'McpContext',
+          attempted: 'resolve page by id',
+          failed: 'page id not found',
+          details: {pageId},
+        },
+      });
     }
     return page;
   }

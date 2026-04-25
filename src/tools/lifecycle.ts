@@ -10,6 +10,7 @@ import {
   type TrackedLaunchEntry,
 } from './lifecycleState.js';
 import {defineTool} from './ToolDefinition.js';
+import {ToolError} from './ToolError.js';
 
 async function resolveProject(
   cwdOverride: string | undefined,
@@ -191,6 +192,7 @@ export const excelStopAddin = defineTool({
       return;
     }
 
+    let anyStopFailed = false;
     for (const entry of entries) {
       try {
         await entry.result.stop();
@@ -199,6 +201,7 @@ export const excelStopAddin = defineTool({
           `Stopped launch for ${entry.project.manifestPath} (pid=${entry.result.pid}).`,
         );
       } catch (error) {
+        anyStopFailed = true;
         trackedByManifest.delete(entry.project.manifestPath);
         if (error instanceof LaunchError) {
           response.appendResponseLine(
@@ -206,9 +209,55 @@ export const excelStopAddin = defineTool({
           );
           continue;
         }
-        throw error;
+        response.appendResponseLine(
+          `WARN: stop() threw: ${(error as Error).message}`,
+        );
       }
     }
+
+    if (!anyStopFailed) {
+      return;
+    }
+
+    response.appendResponseLine(
+      'Graceful stop failed; running force-shutdown fallback.',
+    );
+    const deps = getLifecycleDeps();
+    const result = await deps.forceShutdownAddinProcesses();
+
+    if (result.taskkillOutput) {
+      response.appendResponseLine('--- taskkill ---');
+      response.appendResponseLine(result.taskkillOutput);
+    }
+    if (result.port3000CleanupOutput) {
+      response.appendResponseLine('--- port 3000 cleanup ---');
+      response.appendResponseLine(result.port3000CleanupOutput);
+    }
+    if (result.finalCleanupOutput) {
+      response.appendResponseLine('--- final cleanup (ports 3000, 9222) ---');
+      response.appendResponseLine(result.finalCleanupOutput);
+    }
+
+    if (result.remaining.length > 0) {
+      const summary = result.remaining
+        .map(r => `port=${r.port} pid=${r.pid} state=${r.state ?? 'unknown'}`)
+        .join('; ');
+      throw new ToolError({
+        category: 'internal',
+        isRetryable: true,
+        message: `Force-shutdown completed but processes are still bound to debug/dev-server ports: ${summary}`,
+        context: {
+          toolName: 'excel_stop_addin',
+          attempted: 'force-shutdown excel and dev server',
+          failed: 'ports still bound after force cleanup',
+          details: {remaining: result.remaining},
+        },
+      });
+    }
+
+    response.appendResponseLine(
+      'Force-shutdown verified: ports 3000 and 9222 are clear.',
+    );
   },
 });
 

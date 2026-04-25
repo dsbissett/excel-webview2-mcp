@@ -3,6 +3,7 @@ import type {ElementHandle, Page} from '../third_party/index.js';
 
 import {ToolCategory} from './categories.js';
 import {definePageTool} from './ToolDefinition.js';
+import {ToolError} from './ToolError.js';
 
 export const screenshot = definePageTool({
   name: 'take_screenshot',
@@ -46,7 +47,17 @@ export const screenshot = definePageTool({
   },
   handler: async (request, response, context) => {
     if (request.params.uid && request.params.fullPage) {
-      throw new Error('Providing both "uid" and "fullPage" is not allowed.');
+      throw new ToolError({
+        category: 'validation',
+        isRetryable: false,
+        message: 'Providing both "uid" and "fullPage" is not allowed.',
+        context: {
+          toolName: 'take_screenshot',
+          attempted: 'take screenshot',
+          failed: 'mutually exclusive parameters',
+          details: {uid: request.params.uid, fullPage: request.params.fullPage},
+        },
+      });
     }
 
     let pageOrHandle: Page | ElementHandle;

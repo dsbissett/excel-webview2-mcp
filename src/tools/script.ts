@@ -5,6 +5,7 @@ import type {ExtensionServiceWorker} from '../types.js';
 import {ToolCategory} from './categories.js';
 import type {Context, Response} from './ToolDefinition.js';
 import {defineTool, pageIdSchema} from './ToolDefinition.js';
+import {ToolError} from './ToolError.js';
 
 export type Evaluatable = Page | Frame | WebWorker;
 
@@ -62,12 +63,29 @@ Example with arguments: \`(el) => {
 
       if (cliArgs?.categoryExtensions && serviceWorkerId) {
         if (uidArgs && uidArgs.length > 0) {
-          throw new Error(
-            'args (element uids) cannot be used when evaluating in a service worker.',
-          );
+          throw new ToolError({
+            category: 'validation',
+            isRetryable: false,
+            message:
+              'args (element uids) cannot be used when evaluating in a service worker.',
+            context: {
+              toolName: 'evaluate_script',
+              attempted: 'evaluate script in service worker',
+              failed: 'incompatible parameters',
+            },
+          });
         }
         if (pageId) {
-          throw new Error('specify either a pageId or a serviceWorkerId.');
+          throw new ToolError({
+            category: 'validation',
+            isRetryable: false,
+            message: 'specify either a pageId or a serviceWorkerId.',
+            context: {
+              toolName: 'evaluate_script',
+              attempted: 'evaluate script',
+              failed: 'mutually exclusive parameters',
+            },
+          });
         }
 
         const worker = await getWebWorker(context, serviceWorkerId);
@@ -162,11 +180,31 @@ const getWebWorker = async (
     const worker = await serviceWorker.target.worker();
 
     if (!worker) {
-      throw new Error('Service worker target not found.');
+      throw new ToolError({
+        category: 'not_found',
+        isRetryable: false,
+        message: 'Service worker target not found.',
+        context: {
+          toolName: 'evaluate_script',
+          attempted: 'resolve service worker target',
+          failed: 'service worker target unavailable',
+          details: {serviceWorkerId},
+        },
+      });
     }
 
     return worker;
   } else {
-    throw new Error('Service worker not found.');
+    throw new ToolError({
+      category: 'not_found',
+      isRetryable: false,
+      message: 'Service worker not found.',
+      context: {
+        toolName: 'evaluate_script',
+        attempted: 'resolve service worker',
+        failed: 'service worker id not found',
+        details: {serviceWorkerId},
+      },
+    });
   }
 };

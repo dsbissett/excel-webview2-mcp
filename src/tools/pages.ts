@@ -3,6 +3,7 @@ import type {CdpPage} from '../third_party/index.js';
 import {zod} from '../third_party/index.js';
 
 import {ToolCategory} from './categories.js';
+import {ToolError} from './ToolError.js';
 import {
   CLOSE_PAGE_ERROR,
   definePageTool,
@@ -101,7 +102,16 @@ export const handleDialog = definePageTool({
     const page = request.page;
     const dialog = page.getDialog();
     if (!dialog) {
-      throw new Error('No open dialog found');
+      throw new ToolError({
+        category: 'not_found',
+        isRetryable: false,
+        message: 'No open dialog found',
+        context: {
+          toolName: 'handle_dialog',
+          attempted: 'handle dialog',
+          failed: 'no dialog open on page',
+        },
+      });
     }
 
     switch (request.params.action) {

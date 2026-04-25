@@ -22,6 +22,7 @@ import {
 import {ToolCategory} from './tools/categories.js';
 import type {DefinedPageTool, ToolDefinition} from './tools/ToolDefinition.js';
 import {pageIdSchema} from './tools/ToolDefinition.js';
+import {classifyUnknownError, ToolError} from './tools/ToolError.js';
 import {createTools} from './tools/tools.js';
 import {VERSION} from './version.js';
 
@@ -217,7 +218,16 @@ export async function createMcpServer(
           response.setRedactNetworkHeaders(serverArgs.redactNetworkHeaders);
           if ('pageScoped' in tool && tool.pageScoped) {
             if (!context) {
-              throw new Error(`Tool ${tool.name} requires a browser context.`);
+              throw new ToolError({
+                category: 'unsupported',
+                isRetryable: false,
+                message: `Tool ${tool.name} requires a browser context.`,
+                context: {
+                  toolName: tool.name,
+                  attempted: 'invoke page-scoped tool',
+                  failed: 'no browser context available',
+                },
+              });
             }
             const page =
               serverArgs.experimentalPageIdRouting &&
@@ -263,6 +273,16 @@ export async function createMcpServer(
           return result;
         } catch (err) {
           logger(`${tool.name} error:`, err, err?.stack);
+          // Universal error funnel: every error from every tool flows through
+          // here and is shaped into a structured envelope. Tools must never
+          // format their own error responses. A tool that ran successfully but
+          // produced no items must return a normal response with empty
+          // collections — it must NOT throw. Throwing here means access/operation
+          // failure, not "empty result".
+          const toolError = classifyUnknownError(err, tool.name, params);
+          logger(
+            `${tool.name} classified: category=${toolError.category} retryable=${toolError.isRetryable}`,
+          );
           let errorText =
             err instanceof ConnectionError
               ? err.format()
@@ -271,12 +291,17 @@ export async function createMcpServer(
                 : String(err);
           if (
             !(err instanceof ConnectionError) &&
+            err &&
+            typeof err === 'object' &&
             'cause' in err &&
-            err.cause
+            err.cause &&
+            typeof (err.cause as {message?: unknown}).message === 'string'
           ) {
-            errorText += `\nCause: ${err.cause.message}`;
+            errorText += `\nCause: ${(err.cause as {message: string}).message}`;
           }
-          return {
+          const errorResult: CallToolResult & {
+            structuredContent?: Record<string, unknown>;
+          } = {
             content: [
               {
                 type: 'text',
@@ -285,6 +310,11 @@ export async function createMcpServer(
             ],
             isError: true,
           };
+          if (serverArgs.experimentalStructuredContent) {
+            errorResult.structuredContent =
+              toolError.toStructured() as unknown as Record<string, unknown>;
+          }
+          return errorResult;
         } finally {
           void clearcutLogger?.logToolInvocation({
             toolName: tool.name,

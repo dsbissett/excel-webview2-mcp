@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: write
 
     steps:
       - name: Checkout repository
@@ -76,3 +77,15 @@ jobs:
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Install mcp-publisher
+        if: steps.release-tag.outputs.found == 'true' && steps.npm-version.outputs.should_publish == 'true'
+        run: |
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/download/v1.1.0/mcp-publisher_1.1.0_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" \
+            | tar xz mcp-publisher
+
+      - name: Publish to MCP registry
+        if: steps.release-tag.outputs.found == 'true' && steps.npm-version.outputs.should_publish == 'true'
+        run: |
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish
